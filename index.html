@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NABH 40-KPI & RCPA Quality Portal</title>
+  < src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #f1f5f9; }
+    .print-only { display: none; }
+    @media print {
+      .no-print { display: none !important; }
+      .print-only { display: block !important; }
+      body { background: #fff !important; }
+      .shadow-sm, .shadow-md, .shadow-xl { box-shadow: none !important; }
+    }
+  </style>
+</head>
+<body class="text-slate-800">
+
+<!-- ===================================================================== -->
+<!-- CONFIGURATION: PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL BELOW        -->
+<!-- ===================================================================== -->
+<script>
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4DqTDpTJ1XrmP8WpBFcNrv7XvnKvI_D-6gm5xhm9VhPMI6-8JCi54lUErudU_xFXz/exec";
+</script>
+
+<!-- LOADING OVERLAY -->
+<div id="loader" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center">
+  <div class="bg-white px-6 py-4 rounded-xl shadow-xl flex items-center gap-3">
+    <i class="fa-solid fa-circle-notch fa-spin text-indigo-600 text-xl"></i>
+    <span class="font-semibold text-slate-700 text-sm" id="loader-text">Syncing with Master Sheet...</span>
+  </div>
+</div>
+
+<!-- ===================================================================== -->
+<!-- VIEW 1: LOGIN & NEW HOSPITAL / STAFF SIGNUP                           -->
+<!-- ===================================================================== -->
+<div id="auth-view" class="min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white w-full max-w-md rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+    <div class="bg-slate-900 text-white p-6 text-center">
+      <div class="w-12 h-12 bg-indigo-600 rounded-xl mx-auto flex items-center justify-center text-xl font-bold mb-3">
+        <i class="fa-solid fa-hospital-user"></i>
+      </div>
+      <h1 class="text-xl font-bold">NABH Clinical Quality & KPI Portal</h1>
+      <p class="text-xs text-slate-400 mt-1">6-Month Indicator Tracking, RCPA & Multi-Hospital Quality System</p>
+    </div>
+
+    <!-- Auth Tabs -->
+    <div class="grid grid-cols-2 border-b border-slate-200 text-sm font-semibold">
+      <button id="tab-login" onclick="switchAuthTab('login')" class="py-3 text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/40">
+        <i class="fa-solid fa-right-to-bracket mr-1"></i> Login
+      </button>
+      <button id="tab-signup" onclick="switchAuthTab('signup')" class="py-3 text-slate-500 hover:text-slate-800">
+        <i class="fa-solid fa-user-plus mr-1"></i> Register / Signup
+      </button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <form id="login-form" onsubmit="handleLoginSubmit(event)" class="p-6 space-y-4">
+      <div>
+        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Username</label>
+        <input type="text" id="login-username" required placeholder="e.g., sky_admin or sky_icu"
+               class="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Password</label>
+        <input type="password" id="login-password" required placeholder="••••••••"
+               class="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+      </div>
+      <div id="login-error" class="hidden text-xs text-red-600 bg-red-50 p-2.5 rounded-lg border border-red-200 font-medium"></div>
+      <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-lg text-sm transition shadow-sm">
+        Sign In to Portal
+      </button>
+      <p class="text-[11px] text-center text-slate-400">
+        New hospital or department staff? Switch to <b>Register / Signup</b> above.
+      </p>
+    </form>
+
+    <!-- SIGNUP FORM -->
+    <form id="signup-form" onsubmit="handleSignupSubmit(event)" class="hidden p-6 space-y-3.5">
+      <div>
+        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Registration Type</label>
+        <select id="signup-type" onchange="toggleSignupFields()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+          <option value="NEW_HOSPITAL">New Hospital Registration (Hospital Admin)</option>
+          <option value="EXISTING_HOSPITAL">Department User (Existing Hospital ID)</option>
+        </select>
+      </div>
+
+      <div id="field-new-hosp">
+        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Hospital Name</label>
+        <input type="text" id="signup-hosp-name" placeholder="e.g., Apex Multispeciality Hospital"
+               class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+      </div>
+
+      <div id="field-existing-hosp" class="hidden space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Hospital ID (Given by Admin)</label>
+          <input type="text" id="signup-hosp-id" placeholder="e.g., HOSP01"
+                 class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm uppercase" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Select Department</label>
+          <select id="signup-dept" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+            <option value="ICU / Critical Care">ICU / Critical Care</option>
+            <option value="IPD / Nursing">IPD / Nursing</option>
+            <option value="Operation Theatre (OT)">Operation Theatre (OT)</option>
+            <option value="Diagnostics (Lab & Radiology)">Diagnostics (Lab & Radiology)</option>
+            <option value="Pharmacy & Nursing">Pharmacy & Nursing</option>
+            <option value="Infection Control (IPC)">Infection Control (IPC)</option>
+            <option value="Emergency Medicine">Emergency Medicine</option>
+            <option value="Blood Bank">Blood Bank</option>
+            <option value="OPD / Front Office">OPD / Front Office</option>
+            <option value="Billing & MRD">Billing & MRD</option>
+            <option value="Quality & Safety">Quality & Safety</option>
+            <option value="Cardiology">Cardiology</option>
+            <option value="Neurology">Neurology</option>
+            <option value="Obstetrics">Obstetrics</option>
+            <option value="Endocrinology">Endocrinology</option>
+            <option value="Nephrology">Nephrology</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Your Full Name & Designation</label>
+        <input type="text" id="signup-fullname" required placeholder="e.g., Dr. Sharma / Sister Anjali"
+               class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+      </div>
+
+      <div class="grid grid-cols-2 gap-2.5">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Create Username</label>
+          <input type="text" id="signup-username" required placeholder="username"
+                 class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Create Password</label>
+          <input type="password" id="signup-password" required placeholder="••••••"
+                 class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+        </div>
+      </div>
+
+      <div id="signup-msg" class="hidden text-xs p-2.5 rounded-lg border font-medium"></div>
+
+      <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg text-sm transition">
+        Submit Registration (Requires Admin TRUE)
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- ===================================================================== -->
+<!-- VIEW 2: MAIN PORTAL (HOSPITAL ISOLATED)                               -->
+<!-- ===================================================================== -->
+<div id="app-view" class="hidden min-h-screen flex flex-col">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="bg-white border-b border-slate-200 px-4 py-3 sticky top-0 z-30 shadow-xs no-print">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <img id="hdr-logo" src="" alt="Logo" class="hidden w-11 h-11 rounded-lg object-contain border border-slate-200 p-0.5 bg-white" />
+        <div id="hdr-logo-fallback" class="w-11 h-11 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-lg">
+          <i class="fa-solid fa-hospital"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 id="hdr-hosp-name" class="font-bold text-lg text-slate-900 leading-tight">Hospital Name</h1>
+            <span id="hdr-hosp-id" class="text-[11px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded border">HOSP01</span>
+          </div>
+          <p class="text-xs text-slate-500">
+            Logged in as: <b id="hdr-user-name" class="text-slate-700">User</b> •
+            Dept: <b id="hdr-dept" class="text-indigo-600">ALL</b> •
+            Role: <span id="hdr-role-badge" class="font-semibold">Admin</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="loadDashboard()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold">
+          <i class="fa-solid fa-rotate mr-1"></i> Refresh
+        </button>
+        <button onclick="window.print()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-semibold">
+          <i class="fa-solid fa-print mr-1"></i> Print Letterhead Report
+        </button>
+        <button onclick="logout()" class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg text-xs font-semibold">
+          <i class="fa-solid fa-power-off mr-1"></i> Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- PRINT-ONLY OFFICIAL LETTERHEAD HEADER -->
+  <div class="print-only max-w-7xl mx-auto w-full px-4 pt-4 pb-3 border-b-2 border-slate-800 mb-4">
+    <div id="print-letterhead-banner" class="hidden mb-2">
+      <img id="print-letterhead-img" src="" class="w-full max-h-32 object-contain" />
+    </div>
+    <div id="print-default-banner" class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img id="print-logo-img" src="" class="hidden w-14 h-14 object-contain" />
+        <div>
+          <h2 id="print-hosp-title" class="text-2xl font-bold uppercase text-slate-900">HOSPITAL NAME</h2>
+          <p class="text-xs text-slate-600">NABH Clinical Quality & Key Performance Indicators (6-Month Audit & RCPA Report)</p>
+        </div>
+      </div>
+      <div class="text-right text-xs text-slate-600">
+        <p><b>Report Date:</b> <span id="print-date"></span></p>
+        <p><b>Hospital ID:</b> <span id="print-id"></span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUPER-ADMIN LOCK WARNING BANNER (Shown if Admin_Approved == FALSE) -->
+  <div id="lock-banner" class="hidden bg-amber-50 border-b border-amber-300 px-4 py-2.5 no-print">
+    <div class="max-w-7xl mx-auto flex items-center justify-between text-xs text-amber-900">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-lock text-amber-600 text-base"></i>
+        <span>
+          <b>Super-Admin Approval Pending (FALSE):</b> Your Hospital ID is registered, but Master Admin has not set <code>Admin_Approved = TRUE</code> yet.
+          Letterhead upload, Data Approval, and Delete privileges are locked until approved.
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="max-w-7xl mx-auto w-full p-4 flex-1 space-y-4">
+
+    <!-- LETTERHEAD PREVIEW STRIP (If uploaded by Admin) -->
+    <div id="live-letterhead-box" class="hidden bg-white p-2 rounded-xl border border-slate-200 shadow-xs text-center no-print">
+      <img id="live-letterhead-img" src="" alt="Hospital Letterhead" class="max-h-24 mx-auto object-contain" />
+    </div>
+
+    <!-- NAVIGATION TABS -->
+    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2 no-print">
+      <div class="flex flex-wrap gap-1.5">
+        <button onclick="switchMainTab('kpi')" id="mtab-kpi" class="px-4 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-xs">
+          <i class="fa-solid fa-table-cells mr-1.5"></i> 6-Month KPI Data Grid
+        </button>
+        <button onclick="switchMainTab('rcpa')" id="mtab-rcpa" class="px-4 py-2 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
+          <i class="fa-solid fa-screwdriver-wrench mr-1.5"></i> Department RCPA Logs (<span id="rcpa-count">0</span>)
+        </button>
+        <button onclick="switchMainTab('branding')" id="mtab-branding" class="hidden px-4 py-2 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
+          <i class="fa-solid fa-image mr-1.5"></i> Letterhead & Logo Setup
+        </button>
+        <button onclick="switchMainTab('audit')" id="mtab-audit" class="hidden px-4 py-2 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
+          <i class="fa-solid fa-shield-halved mr-1.5"></i> Security & Delete Audit Logs
+        </button>
+      </div>
+
+      <!-- Search & Dept Filter -->
+      <div class="flex items-center gap-2">
+        <select id="filter-dept" onchange="renderKPITable()" class="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-medium">
+          <option value="ALL">All Departments</option>
+        </select>
+        <input type="text" id="search-kpi" onkeyup="renderKPITable()" placeholder="Search indicator..."
+               class="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs w-48" />
+      </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- SECTION A: 6-MONTH KPI DATA GRID                                    -->
+    <!-- =================================================================== -->
+    <section id="sec-kpi" class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+      <div class="p-3.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2 no-print">
+        <div class="text-xs text-slate-600">
+          <i class="fa-solid fa-circle-info text-indigo-600 mr-1"></i>
+          Click any month cell to enter <b>Numerator & Denominator</b>. Entries stay <b>Pending</b> until Hospital Admin approves.
+        </div>
+        <div class="flex items-center gap-3 text-[11px] font-semibold">
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Approved</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Pending Approval</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span> Empty</span>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="bg-slate-900 text-white">
+              <th class="p-2.5 border-r border-slate-700 w-10 text-center">#</th>
+              <th class="p-2.5 border-r border-slate-700 min-w-[240px]">Indicator & Department</th>
+              <th class="p-2.5 border-r border-slate-700 text-center w-24">Unit</th>
+              <!-- Last 6 Months Dynamic Headers -->
+              <th id="m-hdr-0" class="p-2.5 border-r border-slate-700 text-center min-w-[115px]">M1</th>
+              <th id="m-hdr-1" class="p-2.5 border-r border-slate-700 text-center min-w-[115px]">M2</th>
+              <th id="m-hdr-2" class="p-2.5 border-r border-slate-700 text-center min-w-[115px]">M3</th>
+              <th id="m-hdr-3" class="p-2.5 border-r border-slate-700 text-center min-w-[115px]">M4</th>
+              <th id="m-hdr-4" class="p-2.5 border-r border-slate-700 text-center min-w-[115px]">M5</th>
+              <th id="m-hdr-5" class="p-2.5 border-r border-slate-700 text-center min-w-[115px]">M6</th>
+              <th class="p-2.5 text-center w-24 no-print">RCPA</th>
+            </tr>
+          </thead>
+          <tbody id="kpi-tbody" class="divide-y divide-slate-200"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- SECTION B: RCPA RECORDS                                             -->
+    <!-- =================================================================== -->
+    <section id="sec-rcpa" class="hidden bg-white rounded-xl border border-slate-200 shadow-xs p-4 space-y-4">
+      <div class="flex items-center justify-between border-b pb-3">
+        <div>
+          <h2 class="font-bold text-base text-slate-900">Root Cause & Preventive Action (RCPA) Register</h2>
+          <p class="text-xs text-slate-500">Department-wise RCA, Corrective Action, and Preventive Action submissions</p>
+        </div>
+        <button onclick="openRCPAModal(null)" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold no-print">
+          <i class="fa-solid fa-plus mr-1"></i> New RCPA Entry
+        </button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="bg-slate-100 text-slate-700 border-b">
+              <th class="p-2.5">Month</th>
+              <th class="p-2.5">Indicator</th>
+              <th class="p-2.5">Department</th>
+              <th class="p-2.5">Root Cause</th>
+              <th class="p-2.5">Corrective Action</th>
+              <th class="p-2.5">Preventive Action</th>
+              <th class="p-2.5">Submitted By & Time</th>
+            </tr>
+          </thead>
+          <tbody id="rcpa-tbody" class="divide-y divide-slate-200"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- SECTION C: LETTERHEAD & LOGO SETUP (ADMIN + APPROVED ONLY)          -->
+    <!-- =================================================================== -->
+    <section id="sec-branding" class="hidden bg-white rounded-xl border border-slate-200 shadow-xs p-6 max-w-2xl mx-auto space-y-5">
+      <div class="border-b pb-3">
+        <h2 class="font-bold text-base text-slate-900"><i class="fa-solid fa-hospital text-indigo-600 mr-1.5"></i> Hospital Branding & Official Letterhead</h2>
+        <p class="text-xs text-slate-500">Upload your Hospital Logo and Letterhead Banner. This will appear on your dashboard and all printed NABH reports.</p>
+      </div>
+
+      <div id="branding-locked-msg" class="hidden bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-xs font-semibold">
+        <i class="fa-solid fa-lock mr-1"></i> Locked: Super-Admin must set <code>Admin_Approved = TRUE</code> for your hospital before you can upload a Letterhead.
+      </div>
+
+      <form id="branding-form" onsubmit="saveBranding(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Official Hospital Name</label>
+          <input type="text" id="brand-hosp-name" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="border border-dashed border-slate-300 rounded-xl p-4 text-center bg-slate-50">
+            <label class="block text-xs font-bold text-slate-700 mb-2">1. Upload Hospital Logo (Square PNG/JPG)</label>
+            <input type="file" id="brand-logo-file" accept="image/*" onchange="previewImage(this, 'preview-logo')" class="text-xs w-full" />
+            <img id="preview-logo" src="" class="hidden h-20 mx-auto mt-3 object-contain border bg-white p-1 rounded" />
+          </div>
+
+          <div class="border border-dashed border-slate-300 rounded-xl p-4 text-center bg-slate-50">
+            <label class="block text-xs font-bold text-slate-700 mb-2">2. Upload Full Letterhead Header Banner</label>
+            <input type="file" id="brand-lh-file" accept="image/*" onchange="previewImage(this, 'preview-lh')" class="text-xs w-full" />
+            <img id="preview-lh" src="" class="hidden h-20 w-full mx-auto mt-3 object-contain border bg-white p-1 rounded" />
+          </div>
+        </div>
+
+        <button type="submit" id="btn-save-branding" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg text-sm">
+          <i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> Save Letterhead & Logo to Hospital Profile
+        </button>
+      </form>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- SECTION D: SECURITY & DELETE AUDIT TRAIL LOGS (ADMIN ONLY)          -->
+    <!-- =================================================================== -->
+    <section id="sec-audit" class="hidden bg-white rounded-xl border border-slate-200 shadow-xs p-4 space-y-3">
+      <div class="border-b pb-2.5">
+        <h2 class="font-bold text-base text-slate-900"><i class="fa-solid fa-shield-halved text-emerald-600 mr-1.5"></i> Immutable Security & Deletion Audit Log</h2>
+        <p class="text-xs text-slate-500">Every entry creation, approval, letterhead change, and deletion is permanently recorded with username & timestamp.</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="bg-slate-900 text-white">
+              <th class="p-2.5">Timestamp (IST)</th>
+              <th class="p-2.5">User</th>
+              <th class="p-2.5">Department</th>
+              <th class="p-2.5">Action</th>
+              <th class="p-2.5">Record ID</th>
+              <th class="p-2.5">Audit Details</th>
+            </tr>
+          </thead>
+          <tbody id="audit-tbody" class="divide-y divide-slate-200"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ===================================================================== -->
+<!-- MODAL 1: NUMERATOR & DENOMINATOR ENTRY + ADMIN APPROVE / DELETE       -->
+<!-- ===================================================================== -->
+<div id="entry-modal" class="hidden fixed inset-0 bg-slate-900/60 z-40 flex items-center justify-center p-4">
+  <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+    <div class="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
+      <div>
+        <span id="em-month-badge" class="text-[11px] bg-indigo-600 px-2 py-0.5 rounded font-bold">Nov 2026</span>
+        <h3 id="em-title" class="font-bold text-sm mt-1">Indicator Name</h3>
+      </div>
+      <button onclick="closeModal('entry-modal')" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="p-5 space-y-4">
+      <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs space-y-1.5">
+        <p><b class="text-indigo-700">Numerator (अंश):</b> <span id="em-num-def"></span></p>
+        <p><b class="text-emerald-700">Denominator (हर):</b> <span id="em-den-def"></span></p>
+        <p class="text-[11px] text-slate-500 italic" id="em-hindi"></p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Numerator Value</label>
+          <input type="number" step="any" id="em-num-input" oninput="liveCalcResult()"
+                 class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Denominator Value</label>
+          <input type="number" step="any" id="em-den-input" oninput="liveCalcResult()"
+                 class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold" />
+        </div>
+      </div>
+
+      <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-3 flex items-center justify-between">
+        <span class="text-xs font-bold text-indigo-900">Calculated KPI Result:</span>
+        <span id="em-calc-preview" class="text-xl font-extrabold text-indigo-700">0</span>
+      </div>
+
+      <div id="em-meta-info" class="hidden text-[11px] text-slate-500 bg-slate-100 p-2 rounded"></div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t">
+        <div id="em-admin-controls" class="hidden flex items-center gap-2">
+          <button type="button" onclick="approveCurrentEntry()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold">
+            <i class="fa-solid fa-check-double mr-1"></i> Approve
+          </button>
+          <button type="button" onclick="deleteCurrentEntry()" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold">
+            <i class="fa-solid fa-trash mr-1"></i> Delete
+          </button>
+        </div>
+        <button type="button" onclick="submitKPIEntry()" class="ml-auto px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold">
+          <i class="fa-solid fa-floppy-disk mr-1"></i> Save Data (Pending Approval)
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================================================================== -->
+<!-- MODAL 2: DEPARTMENT RCPA SUBMISSION                                   -->
+<!-- ===================================================================== -->
+<div id="rcpa-modal" class="hidden fixed inset-0 bg-slate-900/60 z-40 flex items-center justify-center p-4">
+  <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+    <div class="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
+      <h3 class="font-bold text-sm"><i class="fa-solid fa-screwdriver-wrench mr-1.5 text-amber-400"></i> Submit Department RCPA</h3>
+      <button onclick="closeModal('rcpa-modal')" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form onsubmit="submitRCPAForm(event)" class="p-5 space-y-3.5 text-xs">
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Select Month</label>
+          <select id="rcpa-month" class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white"></select>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Select Indicator</label>
+          <select id="rcpa-indicator" class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white"></select>
+        </div>
+      </div>
+      <div>
+        <label class="block font-bold text-slate-700 mb-1">1. Root Cause Analysis (RCA - कारण)</label>
+        <textarea id="rcpa-root" required rows="2" placeholder="Why did this deviation or incident occur?"
+                  class="w-full px-3 py-2 border border-slate-300 rounded-lg"></textarea>
+      </div>
+      <div>
+        <label class="block font-bold text-slate-700 mb-1">2. Corrective Action (तत्काल सुधार)</label>
+        <textarea id="rcpa-corr" required rows="2" placeholder="Immediate action taken to fix the issue..."
+                  class="w-full px-3 py-2 border border-slate-300 rounded-lg"></textarea>
+      </div>
+      <div>
+        <label class="block font-bold text-slate-700 mb-1">3. Preventive Action (भविष्य में रोकथाम)</label>
+        <textarea id="rcpa-prev" required rows="2" placeholder="System/training change to prevent recurrence..."
+                  class="w-full px-3 py-2 border border-slate-300 rounded-lg"></textarea>
+      </div>
+      <div class="flex justify-end gap-2 pt-2 border-t">
+        <button type="button" onclick="closeModal('rcpa-modal')" class="px-4 py-2 bg-slate-100 rounded-lg font-bold">Cancel</button>
+        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg font-bold">Save RCPA Record</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================================================================== -->
+<!-- JAVA APPLICATION LOGIC                                          -->
+<!-- ===================================================================== -->
+<>
+  let CURRENT_USER = null;
+  let STATE = {
+    adminApproved: false,
+    hospitalName: "",
+    logoUrl: "",
+    letterheadUrl: "",
+    indicators: [],
+    entries: [],
+    rcpas: [],
+    auditLogs: []
+  };
+  let ACTIVE_CELL = null; // { ind, month, existingEntry }
+
+  // Generate Last 6 Months dynamically (e.g., Jun 2026 to Nov 2026)
+  function getLast6Months() {
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const list = [];
+    const now = new Date();
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      list.push(`${months[d.getMonth()]} ${d.getFullYear()}`);
+    }
+    return list;
+  }
+  const LAST_6_MONTHS = getLast6Months();
+
+  // API Helper
+  async function callBackend(payload) {
+    if (!APPS__URL || APPS__URL.includes("YOUR_GOOGLE_APPS_")) {
+      alert("Please paste your deployed Google Apps  Web App URL in APPS__URL inside index.html!");
+      throw new Error("Missing Apps  URL");
+    }
+    document.getElementById("loader").classList.remove("hidden");
+    try {
+      const res = await fetch(APPS__URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+      return await res.json();
+    } finally {
+      document.getElementById("loader").classList.add("hidden");
+    }
+  }
+
+  // Auth Tab Switcher
+  function switchAuthTab(tab) {
+    const isLogin = tab === "login";
+    document.getElementById("login-form").classList.toggle("hidden", !isLogin);
+    document.getElementById("signup-form").classList.toggle("hidden", isLogin);
+    document.getElementById("tab-login").className = isLogin
+      ? "py-3 text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/40"
+      : "py-3 text-slate-500 hover:text-slate-800";
+    document.getElementById("tab-signup").className = !isLogin
+      ? "py-3 text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/40"
+      : "py-3 text-slate-500 hover:text-slate-800";
+  }
+
+  function toggleSignupFields() {
+    const type = document.getElementById("signup-type").value;
+    document.getElementById("field-new-hosp").classList.toggle("hidden", type !== "NEW_HOSPITAL");
+    document.getElementById("field-existing-hosp").classList.toggle("hidden", type === "NEW_HOSPITAL");
+  }
+
+  async function handleLoginSubmit(e) {
+    e.preventDefault();
+    const errBox = document.getElementById("login-error");
+    errBox.classList.add("hidden");
+    const username = document.getElementById("login-username").value;
+    const password = document.getElementById("login-password").value;
+
+    const res = await callBackend({ action: "login", username, password });
+    if (!res.success) {
+      errBox.textContent = res.message;
+      errBox.classList.remove("hidden");
+      return;
+    }
+    CURRENT_USER = res.user;
+    localStorage.setItem("nabh_kpi_user", JSON.stringify(CURRENT_USER));
+    enterPortal();
+  }
+
+  async function handleSignupSubmit(e) {
+    e.preventDefault();
+    const msgBox = document.getElementById("signup-msg");
+    msgBox.classList.add("hidden");
+
+    const payload = {
+      action: "signup",
+      signupType: document.getElementById("signup-type").value,
+      hospitalName: document.getElementById("signup-hosp-name").value,
+      hospitalId: document.getElementById("signup-hosp-id").value,
+      department: document.getElementById("signup-dept").value,
+      fullName: document.getElementById("signup-fullname").value,
+      username: document.getElementById("signup-username").value,
+      password: document.getElementById("signup-password").value
+    };
+
+    const res = await callBackend(payload);
+    msgBox.textContent = res.message;
+    msgBox.className = res.success
+      ? "text-xs p-2.5 rounded-lg border font-medium bg-emerald-50 text-emerald-800 border-emerald-200"
+      : "text-xs p-2.5 rounded-lg border font-medium bg-red-50 text-red-700 border-red-200";
+    msgBox.classList.remove("hidden");
+    if (res.success) e.target.reset();
+  }
+
+  function logout() {
+    localStorage.removeItem("nabh_kpi_user");
+    CURRENT_USER = null;
+    document.getElementById("app-view").classList.add("hidden");
+    document.getElementById("auth-view").classList.remove("hidden");
+  }
+
+  async function enterPortal() {
+    document.getElementById("auth-view").classList.add("hidden");
+    document.getElementById("app-view").classList.remove("hidden");
+
+    // Set 6-month column headers
+    LAST_6_MONTHS.forEach((m, idx) => {
+      document.getElementById("m-hdr-" + idx).textContent = m;
+    });
+    document.getElementById("print-date").textContent = new Date().toLocaleDateString("en-IN");
+    document.getElementById("print-id").textContent = CURRENT_USER.hospitalId;
+
+    await loadDashboard();
+  }
+
+  async function loadDashboard() {
+    const res = await callBackend({
+      action: "getDashboardData",
+      hospitalId: CURRENT_USER.hospitalId,
+      role: CURRENT_USER.role,
+      department: CURRENT_USER.department
+    });
+    if (!res.success) return alert(res.message);
+
+    STATE = res;
+    applyBrandingAndPermissions();
+    populateDeptDropdown();
+    renderKPITable();
+    renderRCPATable();
+    renderAuditTable();
+  }
+
+  function applyBrandingAndPermissions() {
+    const hName = STATE.hospitalName || CURRENT_USER.hospitalName;
+    document.getElementById("hdr-hosp-name").textContent = hName;
+    document.getElementById("print-hosp-title").textContent = hName;
+    document.getElementById("brand-hosp-name").value = hName;
+    document.getElementById("hdr-hosp-id").textContent = CURRENT_USER.hospitalId;
+    document.getElementById("hdr-user-name").textContent = CURRENT_USER.fullName;
+    document.getElementById("hdr-dept").textContent = CURRENT_USER.department;
+    document.getElementById("hdr-role-badge").textContent = CURRENT_USER.role;
+
+    // Logo
+    if (STATE.logoUrl) {
+      document.getElementById("hdr-logo").src = STATE.logoUrl;
+      document.getElementById("hdr-logo").classList.remove("hidden");
+      document.getElementById("hdr-logo-fallback").classList.add("hidden");
+      document.getElementById("print-logo-img").src = STATE.logoUrl;
+      document.getElementById("print-logo-img").classList.remove("hidden");
+      document.getElementById("preview-logo").src = STATE.logoUrl;
+      document.getElementById("preview-logo").classList.remove("hidden");
+    }
+
+    // Letterhead Banner
+    if (STATE.letterheadUrl) {
+      document.getElementById("live-letterhead-img").src = STATE.letterheadUrl;
+      document.getElementById("live-letterhead-box").classList.remove("hidden");
+      document.getElementById("print-letterhead-img").src = STATE.letterheadUrl;
+      document.getElementById("print-letterhead-banner").classList.remove("hidden");
+      document.getElementById("print-default-banner").classList.add("hidden");
+      document.getElementById("preview-lh").src = STATE.letterheadUrl;
+      document.getElementById("preview-lh").classList.remove("hidden");
+    }
+
+    // Lock Banner if Admin_Approved == FALSE
+    document.getElementById("lock-banner").classList.toggle("hidden", STATE.adminApproved);
+
+    // Admin Tabs Visibility
+    const isAdmin = CURRENT_USER.role === "Admin";
+    document.getElementById("mtab-branding").classList.toggle("hidden", !isAdmin);
+    document.getElementById("mtab-audit").classList.toggle("hidden", !isAdmin);
+
+    // Branding Form Lock if Admin_Approved == FALSE
+    document.getElementById("branding-locked-msg").classList.toggle("hidden", STATE.adminApproved);
+    document.getElementById("btn-save-branding").disabled = !STATE.adminApproved;
+    if (!STATE.adminApproved) {
+      document.getElementById("btn-save-branding").classList.add("opacity-50", "cursor-not-allowed");
+    } else {
+      document.getElementById("btn-save-branding").classList.remove("opacity-50", "cursor-not-allowed");
+    }
+  }
+
+  function populateDeptDropdown() {
+    const sel = document.getElementById("filter-dept");
+    const depts = [...new Set(STATE.indicators.map(i => i.department))];
+    sel.innerHTML = `<option value="ALL">All Departments (${STATE.indicators.length})</option>` +
+      depts.map(d => `<option value="${d}">${d}</option>`).join("");
+  }
+
+  function renderKPITable() {
+    const tbody = document.getElementById("kpi-tbody");
+    const deptFilter = document.getElementById("filter-dept").value;
+    const q = document.getElementById("search-kpi").value.toLowerCase();
+
+    const filtered = STATE.indicators.filter(ind => {
+      const matchDept = deptFilter === "ALL" || ind.department === deptFilter;
+      const matchText = ind.name.toLowerCase().includes(q) || String(ind.sno).includes(q);
+      return matchDept && matchText;
+    });
+
+    tbody.innerHTML = filtered.map(ind => {
+      const monthCells = LAST_6_MONTHS.map(m => {
+        const entry = STATE.entries.find(e => Number(e.sno) === Number(ind.sno) && e.monthYear === m);
+        if (!entry) {
+          return `<td onclick='openEntryModal(${ind.sno}, "${m}")' class="p-2 border-r border-slate-200 text-center cursor-pointer hover:bg-indigo-50 transition">
+            <span class="text-[11px] text-slate-400 font-medium">+ Enter</span>
+          </td>`;
+        }
+        const isApproved = entry.approvalStatus === "Approved";
+        const badgeCls = isApproved
+          ? "bg-emerald-50 text-emerald-800 border-emerald-300"
+          : "bg-amber-50 text-amber-800 border-amber-300";
+        return `<td onclick='openEntryModal(${ind.sno}, "${m}")' class="p-1.5 border-r border-slate-200 text-center cursor-pointer hover:opacity-80">
+          <div class="border ${badgeCls} rounded-lg px-1.5 py-1">
+            <div class="font-extrabold text-xs">${entry.result}</div>
+            <div class="text-[10px] opacity-75">${entry.numerator}/${entry.denominator}</div>
+            <div class="text-[9px] uppercase font-bold mt-0.5">${isApproved ? "✓ Approved" : "⏳ Pending"}</div>
+          </div>
+        </td>`;
+      }).join("");
+
+      return `<tr class="hover:bg-slate-50/80">
+        <td class="p-2.5 border-r border-slate-200 text-center font-bold text-slate-600">${ind.sno}</td>
+        <td class="p-2.5 border-r border-slate-200">
+          <div class="font-bold text-slate-900">${ind.name}</div>
+          <div class="text-[11px] text-indigo-600 font-semibold mt-0.5">${ind.department} • <span class="text-slate-400">${ind.stdRef}</span></div>
+        </td>
+        <td class="p-2.5 border-r border-slate-200 text-center text-[11px] text-slate-600">${ind.unitFreq}</td>
+        ${monthCells}
+        <td class="p-2 text-center no-print">
+          <button onclick='openRCPAModal(${ind.sno})' class="px-2.5 py-1 bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-700 rounded text-[11px] font-bold transition">
+            + RCPA
+          </button>
+        </td>
+      </tr>`;
+    }).join("");
+  }
+
+  // Entry Modal Functions
+  function openEntryModal(sno, monthYear) {
+    const ind = STATE.indicators.find(i => Number(i.sno) === Number(sno));
+    const existing = STATE.entries.find(e => Number(e.sno) === Number(sno) && e.monthYear === monthYear);
+    ACTIVE_CELL = { ind, monthYear, existing };
+
+    document.getElementById("em-month-badge").textContent = monthYear;
+    document.getElementById("em-title").textContent = `#${ind.sno}. ${ind.name}`;
+    document.getElementById("em-num-def").textContent = ind.numeratorDef;
+    document.getElementById("em-den-def").textContent = ind.denominatorDef;
+    document.getElementById("em-hindi").textContent = ind.meaningHindi;
+
+    document.getElementById("em-num-input").value = existing ? existing.numerator : "";
+    document.getElementById("em-den-input").value = existing ? existing.denominator : (ind.multiplier === 0 ? 1 : "");
+    liveCalcResult();
+
+    const metaBox = document.getElementById("em-meta-info");
+    if (existing) {
+      metaBox.innerHTML = `Entered by <b>${existing.enteredBy}</b> at ${existing.entryTimestamp} • Status: <b>${existing.approvalStatus}</b>` +
+        (existing.approvedBy ? ` (Approved by ${existing.approvedBy} at ${existing.approvalTimestamp})` : "");
+      metaBox.classList.remove("hidden");
+    } else {
+      metaBox.classList.add("hidden");
+    }
+
+    // Show Approve/Delete buttons ONLY if role == Admin AND Admin_Approved == TRUE AND entry exists
+    const canAdminAct = CURRENT_USER.role === "Admin" && STATE.adminApproved && Boolean(existing);
+    document.getElementById("em-admin-controls").classList.toggle("hidden", !canAdminAct);
+
+    document.getElementById("entry-modal").classList.remove("hidden");
+  }
+
+  function liveCalcResult() {
+    if (!ACTIVE_CELL) return;
+    const num = parseFloat(document.getElementById("em-num-input").value) || 0;
+    const den = parseFloat(document.getElementById("em-den-input").value) || 0;
+    const mult = Number(ACTIVE_CELL.ind.multiplier);
+    let res = 0;
+    if (mult === 0) res = num;
+    else if (den > 0) res = ((num / den) * mult).toFixed(2);
+    document.getElementById("em-calc-preview").textContent = res;
+  }
+
+  async function submitKPIEntry() {
+    const num = document.getElementById("em-num-input").value;
+    const den = document.getElementById("em-den-input").value;
+    if (num === "" || den === "") return alert("Please enter both Numerator and Denominator.");
+
+    const res = await callBackend({
+      action: "saveKPIEntry",
+      hospitalId: CURRENT_USER.hospitalId,
+      hospitalName: STATE.hospitalName || CURRENT_USER.hospitalName,
+      username: CURRENT_USER.username,
+      monthYear: ACTIVE_CELL.monthYear,
+      sno: ACTIVE_CELL.ind.sno,
+      indicatorName: ACTIVE_CELL.ind.name,
+      department: ACTIVE_CELL.ind.department,
+      numerator: Number(num),
+      denominator: Number(den),
+      multiplier: ACTIVE_CELL.ind.multiplier
+    });
+
+    if (res.success) {
+      closeModal("entry-modal");
+      await loadDashboard();
+    } else {
+      alert(res.message);
+    }
+  }
+
+  async function approveCurrentEntry() {
+    if (!ACTIVE_CELL || !ACTIVE_CELL.existing) return;
+    const res = await callBackend({
+      action: "approveKPIEntry",
+      hospitalId: CURRENT_USER.hospitalId,
+      hospitalName: STATE.hospitalName,
+      username: CURRENT_USER.username,
+      entryId: ACTIVE_CELL.existing.entryId
+    });
+    if (res.success) {
+      closeModal("entry-modal");
+      await loadDashboard();
+    } else {
+      alert(res.message);
+    }
+  }
+
+  async function deleteCurrentEntry() {
+    if (!ACTIVE_CELL || !ACTIVE_CELL.existing) return;
+    if (!confirm("Are you sure you want to delete this entry? This deletion will be logged with your username & timestamp.")) return;
+    const res = await callBackend({
+      action: "deleteKPIEntry",
+      hospitalId: CURRENT_USER.hospitalId,
+      hospitalName: STATE.hospitalName,
+      username: CURRENT_USER.username,
+      entryId: ACTIVE_CELL.existing.entryId
+    });
+    if (res.success) {
+      closeModal("entry-modal");
+      await loadDashboard();
+    } else {
+      alert(res.message);
+    }
+  }
+
+  // RCPA Modal & Rendering
+  function openRCPAModal(sno) {
+    document.getElementById("rcpa-month").innerHTML = LAST_6_MONTHS.map(m => `<option value="${m}">${m}</option>`).join("");
+    document.getElementById("rcpa-indicator").innerHTML = STATE.indicators.map(i =>
+      `<option value="${i.sno}" ${Number(i.sno) === Number(sno) ? "selected" : ""}>#${i.sno} - ${i.name}</option>`
+    ).join("");
+    document.getElementById("rcpa-modal").classList.remove("hidden");
+  }
+
+  async function submitRCPAForm(e) {
+    e.preventDefault();
+    const sno = Number(document.getElementById("rcpa-indicator").value);
+    const ind = STATE.indicators.find(i => Number(i.sno) === sno);
+    const res = await callBackend({
+      action: "saveRCPA",
+      hospitalId: CURRENT_USER.hospitalId,
+      hospitalName: STATE.hospitalName,
+      username: CURRENT_USER.username,
+      monthYear: document.getElementById("rcpa-month").value,
+      sno: sno,
+      indicatorName: ind.name,
+      department: ind.department,
+      rootCause: document.getElementById("rcpa-root").value,
+      correctiveAction: document.getElementById("rcpa-corr").value,
+      preventiveAction: document.getElementById("rcpa-prev").value
+    });
+    if (res.success) {
+      e.target.reset();
+      closeModal("rcpa-modal");
+      await loadDashboard();
+      switchMainTab("rcpa");
+    } else {
+      alert(res.message);
+    }
+  }
+
+  function renderRCPATable() {
+    document.getElementById("rcpa-count").textContent = STATE.rcpas.length;
+    const tbody = document.getElementById("rcpa-tbody");
+    if (!STATE.rcpas.length) {
+      tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">No RCPA records submitted yet.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = STATE.rcpas.map(r => `
+      <tr class="hover:bg-slate-50">
+        <td class="p-2.5 font-bold">${r.monthYear}</td>
+        <td class="p-2.5 font-semibold text-slate-800">#${r.sno}. ${r.indicatorName}</td>
+        <td class="p-2.5 text-indigo-600 font-semibold">${r.department}</td>
+        <td class="p-2.5">${r.rootCause}</td>
+        <td class="p-2.5">${r.correctiveAction}</td>
+        <td class="p-2.5">${r.preventiveAction}</td>
+        <td class="p-2.5 text-[11px] text-slate-500"><b>${r.submittedBy}</b><br/>${r.timestamp}</td>
+      </tr>
+    `).join("");
+  }
+
+  // Letterhead & Logo Image Compression + Upload
+  let TEMP_LOGO_B64 = "";
+  let TEMP_LH_B64 = "";
+
+  function previewImage(input, imgId) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const img = new Image();
+      img.onload = function() {
+        // Resize cleanly so it fits smoothly inside Google Sheet cell (<45,000 chars)
+        const canvas = document.createElement("canvas");
+        const maxW = imgId === "preview-lh" ? 900 : 250;
+        const scale = Math.min(1, maxW / img.width);
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const compressed = canvas.toDataURL("image/jpeg", 0.75);
+
+        const previewEl = document.getElementById(imgId);
+        previewEl.src = compressed;
+        previewEl.classList.remove("hidden");
+
+        if (imgId === "preview-logo") TEMP_LOGO_B64 = compressed;
+        if (imgId === "preview-lh") TEMP_LH_B64 = compressed;
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function saveBranding(e) {
+    e.preventDefault();
+    if (!STATE.adminApproved) return alert("Super-Admin approval (TRUE) required.");
+    const res = await callBackend({
+      action: "updateBranding",
+      hospitalId: CURRENT_USER.hospitalId,
+      username: CURRENT_USER.username,
+      hospitalName: document.getElementById("brand-hosp-name").value,
+      logoUrl: TEMP_LOGO_B64 || STATE.logoUrl,
+      letterheadUrl: TEMP_LH_B64 || STATE.letterheadUrl
+    });
+    if (res.success) {
+      alert("Hospital Logo & Letterhead saved successfully!");
+      await loadDashboard();
+    } else {
+      alert(res.message);
+    }
+  }
+
+  function renderAuditTable() {
+    const tbody = document.getElementById("audit-tbody");
+    if (!STATE.auditLogs || !STATE.auditLogs.length) {
+      tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400">No audit logs recorded yet.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = STATE.auditLogs.map(l => {
+      const isDel = l.actionType.includes("DELETE");
+      return `<tr class="${isDel ? "bg-red-50/60" : ""}">
+        <td class="p-2.5 font-mono text-[11px]">${l.timestamp}</td>
+        <td class="p-2.5 font-bold">${l.username}</td>
+        <td class="p-2.5">${l.department}</td>
+        <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${isDel ? "bg-red-100 text-red-700" : "bg-slate-100 text-slate-700"}">${l.actionType}</span></td>
+        <td class="p-2.5 font-mono text-[11px]">${l.recordId}</td>
+        <td class="p-2.5">${l.details}</td>
+      </tr>`;
+    }).join("");
+  }
+
+  function switchMainTab(tab) {
+    ["kpi", "rcpa", "branding", "audit"].forEach(t => {
+      document.getElementById("sec-" + t).classList.toggle("hidden", t !== tab);
+      const btn = document.getElementById("mtab-" + t);
+      if (btn) {
+        btn.className = t === tab
+          ? "px-4 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-xs"
+          : (btn.classList.contains("hidden") ? "hidden" : "px-4 py-2 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50");
+      }
+    });
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.add("hidden");
+  }
+
+  // Auto-restore session if already logged in
+  window.onload = function() {
+    const saved = localStorage.getItem("nabh_kpi_user");
+    if (saved) {
+      CURRENT_USER = JSON.parse(saved);
+      enterPortal();
+    }
+  };
+</>
+</body>
+</html>
