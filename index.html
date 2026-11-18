@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NABH 40-KPI & RCPA Quality Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <style>
     body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #f1f5f9; }
@@ -44,10 +45,9 @@
         <i class="fa-solid fa-hospital-user"></i>
       </div>
       <h1 class="text-xl font-bold">NABH Clinical Quality & KPI Portal</h1>
-      <p class="text-xs text-slate-400 mt-1">Mobile-ID Login • Multi-Department Access • 6-Month KPI & RCPA System</p>
+      <p class="text-xs text-slate-400 mt-1">Mobile-ID Login • Custom Benchmarks • Trend Graphs & RCPA System</p>
     </div>
 
-    <!-- Auth Tabs -->
     <div class="grid grid-cols-2 border-b border-slate-200 text-sm font-semibold">
       <button id="tab-login" onclick="switchAuthTab('login')" class="py-3 text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/40">
         <i class="fa-solid fa-right-to-bracket mr-1"></i> Login
@@ -57,7 +57,7 @@
       </button>
     </div>
 
-    <!-- LOGIN FORM (MOBILE NUMBER AS USER ID) -->
+    <!-- LOGIN FORM -->
     <form id="login-form" onsubmit="handleLoginSubmit(event)" class="p-6 space-y-4">
       <div>
         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">
@@ -80,7 +80,7 @@
       </p>
     </form>
 
-    <!-- SIGNUP FORM (MULTI-DEPARTMENT CHECKBOXES + MOBILE USER ID) -->
+    <!-- SIGNUP FORM -->
     <form id="signup-form" onsubmit="handleSignupSubmit(event)" class="hidden p-6 space-y-3.5 max-h-[82vh] overflow-y-auto">
       <div>
         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Registration Type</label>
@@ -192,7 +192,7 @@
         <img id="print-logo-img" src="" class="hidden w-14 h-14 object-contain" />
         <div>
           <h2 id="print-hosp-title" class="text-2xl font-bold uppercase text-slate-900">HOSPITAL NAME</h2>
-          <p class="text-xs text-slate-600">NABH Clinical Quality & Key Performance Indicators (6-Month Audit & RCPA Report)</p>
+          <p class="text-xs text-slate-600">NABH Clinical Quality & Key Performance Indicators (6-Month Audit, Trend Graphs & RCPA Report)</p>
         </div>
       </div>
       <div class="text-right text-xs text-slate-600">
@@ -202,14 +202,14 @@
     </div>
   </div>
 
-  <!-- SUPER-ADMIN LOCK WARNING BANNER (Shown if Admin_Approved == FALSE) -->
+  <!-- SUPER-ADMIN LOCK WARNING BANNER -->
   <div id="lock-banner" class="hidden bg-amber-50 border-b border-amber-300 px-4 py-2.5 no-print">
     <div class="max-w-7xl mx-auto flex items-center justify-between text-xs text-amber-900">
       <div class="flex items-center gap-2">
         <i class="fa-solid fa-lock text-amber-600 text-base"></i>
         <span>
           <b>Super-Admin Approval Pending (FALSE):</b> Master Admin has not set <code>Admin_Approved = TRUE</code> for this hospital yet.
-          Letterhead upload, Data Approval, Staff Access editing, and Delete privileges are locked until approved.
+          Letterhead upload, Benchmark setup, Data Approval, Staff Access editing, and Delete privileges are locked until approved.
         </span>
       </div>
     </div>
@@ -229,17 +229,23 @@
         <button onclick="switchMainTab('kpi')" id="mtab-kpi" class="px-3.5 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-xs">
           <i class="fa-solid fa-table-cells mr-1"></i> 6-Month KPI Grid
         </button>
+        <button onclick="switchMainTab('graphs')" id="mtab-graphs" class="px-3.5 py-2 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
+          <i class="fa-solid fa-chart-line mr-1 text-indigo-600"></i> Trend Graphs & Analytics
+        </button>
         <button onclick="switchMainTab('pending')" id="mtab-pending" class="hidden px-3.5 py-2 rounded-lg text-xs font-bold bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100">
           <i class="fa-solid fa-hourglass-half mr-1"></i> Pending Approvals (<span id="pending-count">0</span>)
         </button>
         <button onclick="switchMainTab('rcpa')" id="mtab-rcpa" class="px-3.5 py-2 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
           <i class="fa-solid fa-screwdriver-wrench mr-1"></i> RCPA Logs (<span id="rcpa-count">0</span>)
         </button>
+        <button onclick="switchMainTab('benchmarks')" id="mtab-benchmarks" class="hidden px-3.5 py-2 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
+          <i class="fa-solid fa-bullseye mr-1 text-rose-600"></i> Set Benchmarks
+        </button>
         <button onclick="switchMainTab('staff')" id="mtab-staff" class="hidden px-3.5 py-2 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
-          <i class="fa-solid fa-users-gear mr-1"></i> Staff & Dept Access
+          <i class="fa-solid fa-users-gear mr-1"></i> Staff Access
         </button>
         <button onclick="switchMainTab('branding')" id="mtab-branding" class="hidden px-3.5 py-2 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
-          <i class="fa-solid fa-image mr-1"></i> Letterhead & Logo
+          <i class="fa-solid fa-image mr-1"></i> Letterhead
         </button>
         <button onclick="switchMainTab('audit')" id="mtab-audit" class="hidden px-3.5 py-2 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
           <i class="fa-solid fa-shield-halved mr-1"></i> Audit Logs
@@ -247,7 +253,7 @@
       </div>
 
       <!-- Search & Dept Filter -->
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2" id="grid-filters">
         <select id="filter-dept" onchange="renderKPITable()" class="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-medium">
           <option value="ALL">All Assigned Departments</option>
         </select>
@@ -263,12 +269,12 @@
       <div class="p-3.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2 no-print">
         <div class="text-xs text-slate-600">
           <i class="fa-solid fa-circle-info text-indigo-600 mr-1"></i>
-          Click any month cell to enter <b>Numerator & Denominator</b>. Entries stay <b>Pending</b> until Hospital Admin approves.
+          Click any month cell to enter <b>Numerator & Denominator</b>. Red border indicates <b>Benchmark Breach</b>.
         </div>
         <div class="flex items-center gap-3 text-[11px] font-semibold">
-          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Approved</span>
-          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Pending Approval</span>
-          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span> Empty</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Approved (Within Target)</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Benchmark Breach</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Pending</span>
         </div>
       </div>
 
@@ -278,7 +284,7 @@
             <tr class="bg-slate-900 text-white">
               <th class="p-2.5 border-r border-slate-700 w-10 text-center">#</th>
               <th class="p-2.5 border-r border-slate-700 min-w-[240px]">Indicator & Department</th>
-              <th class="p-2.5 border-r border-slate-700 text-center w-24">Unit</th>
+              <th class="p-2.5 border-r border-slate-700 text-center w-24">Benchmark</th>
               <th id="m-hdr-0" class="p-2.5 border-r border-slate-700 text-center min-w-[115px]">M1</th>
               <th id="m-hdr-1" class="p-2.5 border-r border-slate-700 text-center min-w-[115px]">M2</th>
               <th id="m-hdr-2" class="p-2.5 border-r border-slate-700 text-center min-w-[115px]">M3</th>
@@ -289,6 +295,96 @@
             </tr>
           </thead>
           <tbody id="kpi-tbody" class="divide-y divide-slate-200"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- SECTION G: 6-MONTH TREND GRAPHS & ANALYTICS                         -->
+    <!-- =================================================================== -->
+    <section id="sec-graphs" class="hidden space-y-4">
+      <!-- Summary KPI Cards -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+          <div class="text-[11px] font-bold text-slate-400 uppercase">Assigned Indicators</div>
+          <div id="stat-total-kpis" class="text-2xl font-extrabold text-slate-900 mt-1">0</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+          <div class="text-[11px] font-bold text-slate-400 uppercase">6-Month Entries Logged</div>
+          <div id="stat-total-entries" class="text-2xl font-extrabold text-indigo-600 mt-1">0</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+          <div class="text-[11px] font-bold text-slate-400 uppercase">Approved vs Pending</div>
+          <div id="stat-approved-ratio" class="text-2xl font-extrabold text-emerald-600 mt-1">0 / 0</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+          <div class="text-[11px] font-bold text-slate-400 uppercase">Benchmark Breaches</div>
+          <div id="stat-breaches" class="text-2xl font-extrabold text-rose-600 mt-1">0</div>
+        </div>
+      </div>
+
+      <!-- Charts Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <!-- Left 2 Cols: Indicator 6-Month Trend Chart with Benchmark Line -->
+        <div class="lg:col-span-2 bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-3">
+            <div>
+              <h3 class="font-bold text-sm text-slate-900"><i class="fa-solid fa-chart-line text-indigo-600 mr-1.5"></i> 6-Month Indicator Performance Trend</h3>
+              <p class="text-[11px] text-slate-500">Blue line = Actual Monthly Result • Red dashed line = Hospital Benchmark Target</p>
+            </div>
+            <select id="chart-kpi-select" onchange="renderTrendChart()" class="px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-bold bg-slate-50 max-w-xs">
+            </select>
+          </div>
+          <div class="h-72 relative">
+            <canvas id="kpi-trend-canvas"></canvas>
+          </div>
+          <div id="chart-kpi-summary" class="bg-slate-50 p-3 rounded-lg border text-xs text-slate-700 flex flex-wrap justify-between gap-2"></div>
+        </div>
+
+        <!-- Right Col: Department Submission Bar Chart -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-3">
+          <div class="border-b pb-3">
+            <h3 class="font-bold text-sm text-slate-900"><i class="fa-solid fa-chart-column text-emerald-600 mr-1.5"></i> Department Data Submissions</h3>
+            <p class="text-[11px] text-slate-500">Approved vs Pending entries across departments</p>
+          </div>
+          <div class="h-72 relative">
+            <canvas id="dept-bar-canvas"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- SECTION B-BM: HOSPITAL BENCHMARK CONFIGURATION (ADMIN ONLY)         -->
+    <!-- =================================================================== -->
+    <section id="sec-benchmarks" class="hidden bg-white rounded-xl border border-slate-200 shadow-xs p-4 space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-3">
+        <div>
+          <h2 class="font-bold text-base text-slate-900"><i class="fa-solid fa-bullseye text-rose-600 mr-1.5"></i> Hospital-Specific KPI Benchmarks</h2>
+          <p class="text-xs text-slate-500">Set target limits for your hospital (stored in <code>BENCHMARK_&lt;HOSPITAL_ID&gt;</code>). Graphs & grid alerts update automatically.</p>
+        </div>
+        <button type="button" id="btn-save-benchmarks" onclick="saveHospitalBenchmarks()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold">
+          <i class="fa-solid fa-floppy-disk mr-1"></i> Save All Benchmarks
+        </button>
+      </div>
+
+      <div id="bm-locked-msg" class="hidden bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-xs font-semibold">
+        <i class="fa-solid fa-lock mr-1"></i> Locked: Super-Admin must set <code>Admin_Approved = TRUE</code> before you can save custom benchmarks.
+      </div>
+
+      <div class="overflow-x-auto max-h-[65vh]">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead class="sticky top-0 bg-slate-900 text-white z-10">
+            <tr>
+              <th class="p-2.5 w-12 text-center">#</th>
+              <th class="p-2.5">Indicator Name</th>
+              <th class="p-2.5">Department</th>
+              <th class="p-2.5">Unit</th>
+              <th class="p-2.5 w-36">Condition</th>
+              <th class="p-2.5 w-32">Target Value</th>
+            </tr>
+          </thead>
+          <tbody id="bm-tbody" class="divide-y divide-slate-200"></tbody>
         </table>
       </div>
     </section>
@@ -419,7 +515,7 @@
     <section id="sec-audit" class="hidden bg-white rounded-xl border border-slate-200 shadow-xs p-4 space-y-3">
       <div class="border-b pb-2.5">
         <h2 class="font-bold text-base text-slate-900"><i class="fa-solid fa-shield-halved text-emerald-600 mr-1.5"></i> Immutable Security & Deletion Audit Log</h2>
-        <p class="text-xs text-slate-500">Every entry creation, approval, letterhead change, and deletion is permanently recorded with Mobile ID & timestamp.</p>
+        <p class="text-xs text-slate-500">Every entry creation, approval, benchmark update, letterhead change, and deletion is permanently recorded.</p>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse text-xs">
@@ -475,7 +571,10 @@
       </div>
 
       <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-3 flex items-center justify-between">
-        <span class="text-xs font-bold text-indigo-900">Calculated KPI Result:</span>
+        <div>
+          <span class="text-xs font-bold text-indigo-900 block">Calculated KPI Result:</span>
+          <span id="em-bm-hint" class="text-[11px] text-slate-600"></span>
+        </div>
         <span id="em-calc-preview" class="text-xl font-extrabold text-indigo-700">0</span>
       </div>
 
@@ -563,7 +662,6 @@
         <label class="block font-bold text-slate-700 mb-1">2. Optional: Add Specific KPI Numbers (Comma-separated)</label>
         <input type="text" id="sm-extra-kpis" placeholder="e.g., KPI: 13, 17, 30"
                class="w-full px-3 py-2 border border-slate-300 rounded-lg font-mono" />
-        <p class="text-[11px] text-slate-400 mt-1">Use this if the staff also needs access to individual indicators outside their ticked departments.</p>
       </div>
       <div class="flex justify-end gap-2 pt-2 border-t">
         <button type="button" onclick="closeModal('staff-modal')" class="px-4 py-2 bg-slate-100 rounded-lg font-bold">Cancel</button>
@@ -605,6 +703,7 @@
     liveUserDept: "",
     allDepartments: [],
     indicators: [],
+    benchmarks: {},
     entries: [],
     rcpas: [],
     auditLogs: [],
@@ -612,6 +711,8 @@
   };
   let ACTIVE_CELL = null;
   let EDITING_STAFF = null;
+  let TREND_CHART_INSTANCE = null;
+  let DEPT_BAR_INSTANCE = null;
 
   function getLast6Months() {
     const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -624,6 +725,15 @@
     return list;
   }
   const LAST_6_MONTHS = getLast6Months();
+
+  function isBenchmarkBreached(sno, resultVal) {
+    const bm = STATE.benchmarks ? STATE.benchmarks[Number(sno)] : null;
+    if (!bm || bm.target === "" || bm.target === null || isNaN(Number(bm.target))) return false;
+    const val = Number(resultVal);
+    const tgt = Number(bm.target);
+    if (bm.condition === ">=") return val < tgt;
+    return val > tgt; // default "<="
+  }
 
   function renderDeptCheckboxes(containerId, selectedList = []) {
     const box = document.getElementById(containerId);
@@ -793,6 +903,8 @@
     applyBrandingAndPermissions();
     populateDeptDropdown();
     renderKPITable();
+    renderBenchmarkTable();
+    renderAnalyticsAndGraphs();
     renderPendingTable();
     renderRCPATable();
     renderStaffTable();
@@ -834,16 +946,21 @@
 
     const isAdmin = CURRENT_USER.role === "Admin";
     document.getElementById("mtab-pending").classList.toggle("hidden", !isAdmin);
+    document.getElementById("mtab-benchmarks").classList.toggle("hidden", !isAdmin);
     document.getElementById("mtab-staff").classList.toggle("hidden", !isAdmin);
     document.getElementById("mtab-branding").classList.toggle("hidden", !isAdmin);
     document.getElementById("mtab-audit").classList.toggle("hidden", !isAdmin);
 
     document.getElementById("branding-locked-msg").classList.toggle("hidden", STATE.adminApproved);
+    document.getElementById("bm-locked-msg").classList.toggle("hidden", STATE.adminApproved);
     document.getElementById("btn-save-branding").disabled = !STATE.adminApproved;
+    document.getElementById("btn-save-benchmarks").disabled = !STATE.adminApproved;
     if (!STATE.adminApproved) {
       document.getElementById("btn-save-branding").classList.add("opacity-50", "cursor-not-allowed");
+      document.getElementById("btn-save-benchmarks").classList.add("opacity-50", "cursor-not-allowed");
     } else {
       document.getElementById("btn-save-branding").classList.remove("opacity-50", "cursor-not-allowed");
+      document.getElementById("btn-save-benchmarks").classList.remove("opacity-50", "cursor-not-allowed");
     }
   }
 
@@ -866,6 +983,9 @@
     });
 
     tbody.innerHTML = filtered.map(ind => {
+      const bm = STATE.benchmarks ? STATE.benchmarks[Number(ind.sno)] : null;
+      const bmLabel = bm ? `<span class="px-1.5 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded font-bold">${bm.condition} ${bm.target}</span>` : `<span class="text-slate-400">Not Set</span>`;
+
       const monthCells = LAST_6_MONTHS.map(m => {
         const entry = STATE.entries.find(e => Number(e.sno) === Number(ind.sno) && e.monthYear === m);
         if (!entry) {
@@ -874,12 +994,17 @@
           </td>`;
         }
         const isApproved = entry.approvalStatus === "Approved";
-        const badgeCls = isApproved
-          ? "bg-emerald-50 text-emerald-800 border-emerald-300"
-          : "bg-amber-50 text-amber-800 border-amber-300";
+        const breached = isBenchmarkBreached(ind.sno, entry.result);
+        let badgeCls = "bg-amber-50 text-amber-800 border-amber-300";
+        if (breached) {
+          badgeCls = "bg-rose-50 text-rose-800 border-rose-400 ring-1 ring-rose-300";
+        } else if (isApproved) {
+          badgeCls = "bg-emerald-50 text-emerald-800 border-emerald-300";
+        }
+
         return `<td onclick='openEntryModal(${ind.sno}, "${m}")' class="p-1.5 border-r border-slate-200 text-center cursor-pointer hover:opacity-80">
           <div class="border ${badgeCls} rounded-lg px-1.5 py-1">
-            <div class="font-extrabold text-xs">${entry.result}</div>
+            <div class="font-extrabold text-xs">${entry.result} ${breached ? '<i class="fa-solid fa-triangle-exclamation text-rose-600"></i>' : ''}</div>
             <div class="text-[10px] opacity-75">${entry.numerator}/${entry.denominator}</div>
             <div class="text-[9px] uppercase font-bold mt-0.5">${isApproved ? "✓ Approved" : "⏳ Pending"}</div>
           </div>
@@ -890,9 +1015,9 @@
         <td class="p-2.5 border-r border-slate-200 text-center font-bold text-slate-600">${ind.sno}</td>
         <td class="p-2.5 border-r border-slate-200">
           <div class="font-bold text-slate-900">${ind.name}</div>
-          <div class="text-[11px] text-indigo-600 font-semibold mt-0.5">${ind.department} • <span class="text-slate-400">${ind.stdRef}</span></div>
+          <div class="text-[11px] text-indigo-600 font-semibold mt-0.5">${ind.department} • <span class="text-slate-400">${ind.unitFreq}</span></div>
         </td>
-        <td class="p-2.5 border-r border-slate-200 text-center text-[11px] text-slate-600">${ind.unitFreq}</td>
+        <td class="p-2.5 border-r border-slate-200 text-center text-[11px]">${bmLabel}</td>
         ${monthCells}
         <td class="p-2 text-center no-print">
           <button onclick='openRCPAModal(${ind.sno})' class="px-2.5 py-1 bg-slate-100 hover:bg-indigo-600 hover:text-white text-slate-700 rounded text-[11px] font-bold transition">
@@ -901,6 +1026,175 @@
         </td>
       </tr>`;
     }).join("");
+  }
+
+  // =========================================================================
+  // TREND GRAPHS & ANALYTICS (Chart.js)
+  // =========================================================================
+  function renderAnalyticsAndGraphs() {
+    document.getElementById("stat-total-kpis").textContent = STATE.indicators.length;
+    document.getElementById("stat-total-entries").textContent = STATE.entries.length;
+    const approvedCnt = STATE.entries.filter(e => e.approvalStatus === "Approved").length;
+    const pendingCnt = STATE.entries.length - approvedCnt;
+    document.getElementById("stat-approved-ratio").textContent = `${approvedCnt} / ${pendingCnt}`;
+
+    const breachCnt = STATE.entries.filter(e => isBenchmarkBreached(e.sno, e.result)).length;
+    document.getElementById("stat-breaches").textContent = breachCnt;
+
+    // Populate Indicator selector for Trend Line Chart
+    const sel = document.getElementById("chart-kpi-select");
+    const prevVal = sel.value;
+    sel.innerHTML = STATE.indicators.map(i =>
+      `<option value="${i.sno}">#${i.sno} - ${i.name}</option>`
+    ).join("");
+    if (prevVal && STATE.indicators.some(i => String(i.sno) === String(prevVal))) {
+      sel.value = prevVal;
+    } else {
+      // Auto-select first indicator that actually has data entered
+      const withData = STATE.indicators.find(i => STATE.entries.some(e => Number(e.sno) === Number(i.sno)));
+      if (withData) sel.value = withData.sno;
+    }
+
+    renderTrendChart();
+    renderDeptBarChart();
+  }
+
+  function renderTrendChart() {
+    const sno = Number(document.getElementById("chart-kpi-select").value);
+    const ind = STATE.indicators.find(i => Number(i.sno) === sno);
+    if (!ind) return;
+
+    const bm = STATE.benchmarks ? STATE.benchmarks[sno] : null;
+    const actualData = LAST_6_MONTHS.map(m => {
+      const e = STATE.entries.find(x => Number(x.sno) === sno && x.monthYear === m);
+      return e ? Number(e.result) : null;
+    });
+
+    const datasets = [{
+      label: `Actual Result (${ind.unitFreq})`,
+      data: actualData,
+      borderColor: "#4f46e5",
+      backgroundColor: "rgba(79, 70, 229, 0.15)",
+      borderWidth: 3,
+      pointRadius: 5,
+      pointBackgroundColor: "#4f46e5",
+      tension: 0.25,
+      spanGaps: true
+    }];
+
+    if (bm && bm.target !== "" && bm.target !== null) {
+      datasets.push({
+        label: `Hospital Benchmark (${bm.condition} ${bm.target})`,
+        data: LAST_6_MONTHS.map(() => Number(bm.target)),
+        borderColor: "#e11d48",
+        borderWidth: 2,
+        borderDash: [6, 6],
+        pointRadius: 0,
+        fill: false
+      });
+    }
+
+    const ctx = document.getElementById("kpi-trend-canvas").getContext("2d");
+    if (TREND_CHART_INSTANCE) TREND_CHART_INSTANCE.destroy();
+    TREND_CHART_INSTANCE = new Chart(ctx, {
+      type: "line",
+      data: { labels: LAST_6_MONTHS, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: "top" } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+
+    const validNums = actualData.filter(v => v !== null);
+    const avg = validNums.length ? (validNums.reduce((a, b) => a + b, 0) / validNums.length).toFixed(2) : "N/A";
+    document.getElementById("chart-kpi-summary").innerHTML = `
+      <span><b>Department:</b> ${ind.department}</span>
+      <span><b>6-Month Average:</b> ${avg}</span>
+      <span><b>Benchmark Target:</b> ${bm ? `${bm.condition} ${bm.target}` : "Not Set"}</span>
+    `;
+  }
+
+  function renderDeptBarChart() {
+    const depts = [...new Set(STATE.indicators.map(i => i.department))];
+    const approvedCounts = depts.map(d =>
+      STATE.entries.filter(e => e.department === d && e.approvalStatus === "Approved").length
+    );
+    const pendingCounts = depts.map(d =>
+      STATE.entries.filter(e => e.department === d && e.approvalStatus !== "Approved").length
+    );
+
+    const ctx = document.getElementById("dept-bar-canvas").getContext("2d");
+    if (DEPT_BAR_INSTANCE) DEPT_BAR_INSTANCE.destroy();
+    DEPT_BAR_INSTANCE = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: depts.map(d => d.split(" ")[0]),
+        datasets: [
+          { label: "Approved", data: approvedCounts, backgroundColor: "#10b981" },
+          { label: "Pending", data: pendingCounts, backgroundColor: "#f59e0b" }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 } } }
+      }
+    });
+  }
+
+  // =========================================================================
+  // HOSPITAL BENCHMARK TABLE & SAVE
+  // =========================================================================
+  function renderBenchmarkTable() {
+    const tbody = document.getElementById("bm-tbody");
+    tbody.innerHTML = STATE.indicators.map(ind => {
+      const bm = STATE.benchmarks ? STATE.benchmarks[Number(ind.sno)] : null;
+      const cond = bm ? bm.condition : "<=";
+      const tgt = bm ? bm.target : "";
+      return `<tr class="hover:bg-slate-50">
+        <td class="p-2.5 text-center font-bold text-slate-600">${ind.sno}</td>
+        <td class="p-2.5 font-semibold text-slate-900">${ind.name}</td>
+        <td class="p-2.5 text-indigo-600 font-medium">${ind.department}</td>
+        <td class="p-2.5 text-slate-500">${ind.unitFreq}</td>
+        <td class="p-2.5">
+          <select id="bm-cond-${ind.sno}" class="w-full px-2 py-1 border border-slate-300 rounded bg-white font-semibold">
+            <option value="<=" ${cond === "<=" ? "selected" : ""}>&lt;= (Lower is better)</option>
+            <option value=">=" ${cond === ">=" ? "selected" : ""}>&gt;= (Higher is better)</option>
+          </select>
+        </td>
+        <td class="p-2.5">
+          <input type="number" step="any" id="bm-val-${ind.sno}" value="${tgt}" placeholder="e.g. 2.0"
+                 class="w-full px-2.5 py-1 border border-slate-300 rounded font-bold text-indigo-700" />
+        </td>
+      </tr>`;
+    }).join("");
+  }
+
+  async function saveHospitalBenchmarks() {
+    if (!STATE.adminApproved) return alert("Super-Admin approval (TRUE) required.");
+    const items = STATE.indicators.map(ind => ({
+      sno: ind.sno,
+      name: ind.name,
+      department: ind.department,
+      condition: document.getElementById(`bm-cond-${ind.sno}`).value,
+      target: document.getElementById(`bm-val-${ind.sno}`).value
+    }));
+
+    const res = await callBackend({
+      action: "saveBenchmarks",
+      hospitalId: CURRENT_USER.hospitalId,
+      hospitalName: STATE.hospitalName,
+      username: `${CURRENT_USER.fullName} (${CURRENT_USER.username})`,
+      items: items
+    });
+    if (res.success) {
+      alert(`Saved ${res.savedCount} benchmarks to BENCHMARK_${CURRENT_USER.hospitalId}!`);
+      await loadDashboard();
+    } else {
+      alert(res.message);
+    }
   }
 
   function renderPendingTable() {
@@ -933,7 +1227,6 @@
     `).join("");
   }
 
-  // Staff Multi-Dept Access Table & Modal
   function renderStaffTable() {
     const tbody = document.getElementById("staff-tbody");
     if (!STATE.hospitalUsers || !STATE.hospitalUsers.length) {
@@ -1011,6 +1304,11 @@
     const ind = STATE.indicators.find(i => Number(i.sno) === Number(sno));
     const existing = STATE.entries.find(e => Number(e.sno) === Number(sno) && e.monthYear === monthYear);
     ACTIVE_CELL = { ind, monthYear, existing };
+
+    const bm = STATE.benchmarks ? STATE.benchmarks[Number(sno)] : null;
+    document.getElementById("em-bm-hint").textContent = bm
+      ? `Hospital Benchmark: ${bm.condition} ${bm.target}`
+      : "No benchmark set for this indicator";
 
     document.getElementById("em-month-badge").textContent = monthYear;
     document.getElementById("em-title").textContent = `#${ind.sno}. ${ind.name}`;
@@ -1235,7 +1533,7 @@
   }
 
   function switchMainTab(tab) {
-    ["kpi", "pending", "rcpa", "staff", "branding", "audit"].forEach(t => {
+    ["kpi", "graphs", "pending", "rcpa", "benchmarks", "staff", "branding", "audit"].forEach(t => {
       document.getElementById("sec-" + t).classList.toggle("hidden", t !== tab);
       const btn = document.getElementById("mtab-" + t);
       if (btn && !btn.classList.contains("hidden")) {
@@ -1250,6 +1548,8 @@
         }
       }
     });
+    document.getElementById("grid-filters").classList.toggle("hidden", tab !== "kpi");
+    if (tab === "graphs") renderAnalyticsAndGraphs();
   }
 
   function closeModal(id) {
