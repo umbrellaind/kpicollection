@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NABH 40-KPI & RCPA Quality Portal</title>
-  < src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <style>
     body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #f1f5f9; }
@@ -497,9 +497,9 @@
 </div>
 
 <!-- ===================================================================== -->
-<!-- JAVA APPLICATION LOGIC                                          -->
+<!-- JAVASCRIPT APPLICATION LOGIC                                          -->
 <!-- ===================================================================== -->
-<>
+<script>
   let CURRENT_USER = null;
   let STATE = {
     adminApproved: false,
@@ -528,13 +528,13 @@
 
   // API Helper
   async function callBackend(payload) {
-    if (!APPS__URL || APPS__URL.includes("YOUR_GOOGLE_APPS_")) {
-      alert("Please paste your deployed Google Apps  Web App URL in APPS__URL inside index.html!");
-      throw new Error("Missing Apps  URL");
+    if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes("YOUR_GOOGLE_APPS_SCRIPT")) {
+      alert("Please paste your deployed Google Apps Script Web App URL in APPS_SCRIPT_URL inside index.html!");
+      throw new Error("Missing Apps Script URL");
     }
     document.getElementById("loader").classList.remove("hidden");
     try {
-      const res = await fetch(APPS__URL, {
+      const res = await fetch(APPS_SCRIPT_URL, {
         method: "POST",
         body: JSON.stringify(payload)
       });
@@ -1006,6 +1006,6 @@
       enterPortal();
     }
   };
-</>
+</script>
 </body>
 </html>
