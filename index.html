@@ -59,6 +59,35 @@
     <form id="login-form" onsubmit="handleLoginSubmit(event)" class="p-6 space-y-4">
       <div>
         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">
+          <i class="fa-solid fa-building-shield text-indigo-600 mr-1"></i> Hospital Code
+        </label>
+        <select id="login-hosp-code" required
+                class="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm font-bold bg-white tracking-wider focus:ring-2 focus:ring-indigo-500 outline-none">
+          <option value="" disabled selected>-- Select Hospital Code --</option>
+          <option value="HOSP01">HOSP01</option>
+          <option value="HOSP02">HOSP02</option>
+          <option value="HOSP03">HOSP03</option>
+          <option value="HOSP04">HOSP04</option>
+          <option value="HOSP05">HOSP05</option>
+          <option value="HOSP06">HOSP06</option>
+          <option value="HOSP07">HOSP07</option>
+          <option value="HOSP08">HOSP08</option>
+          <option value="HOSP09">HOSP09</option>
+          <option value="HOSP10">HOSP10</option>
+          <option value="HOSP11">HOSP11</option>
+          <option value="HOSP12">HOSP12</option>
+          <option value="HOSP13">HOSP13</option>
+          <option value="HOSP14">HOSP14</option>
+          <option value="HOSP15">HOSP15</option>
+          <option value="HOSP16">HOSP16</option>
+          <option value="HOSP17">HOSP17</option>
+          <option value="HOSP18">HOSP18</option>
+          <option value="HOSP19">HOSP19</option>
+          <option value="HOSP20">HOSP20</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">
           <i class="fa-solid fa-mobile-screen-button text-indigo-600 mr-1"></i> Mobile Number (User ID)
         </label>
         <input type="text" id="login-username" required placeholder="Enter 10-digit Mobile Number"
@@ -96,9 +125,32 @@
 
       <div id="field-existing-hosp" class="hidden space-y-3">
         <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Select Your Hospital</label>
-          <select id="signup-hosp-id" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white font-semibold">
-            <option value="">Loading hospitals...</option>
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">
+            <i class="fa-solid fa-building-shield text-indigo-600 mr-1"></i> Enter Hospital Code (Given by Admin)
+          </label>
+          <select id="signup-hosp-id"
+                  class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold bg-white tracking-wider">
+            <option value="" disabled selected>-- Select Hospital Code --</option>
+          <option value="HOSP01">HOSP01</option>
+          <option value="HOSP02">HOSP02</option>
+          <option value="HOSP03">HOSP03</option>
+          <option value="HOSP04">HOSP04</option>
+          <option value="HOSP05">HOSP05</option>
+          <option value="HOSP06">HOSP06</option>
+          <option value="HOSP07">HOSP07</option>
+          <option value="HOSP08">HOSP08</option>
+          <option value="HOSP09">HOSP09</option>
+          <option value="HOSP10">HOSP10</option>
+          <option value="HOSP11">HOSP11</option>
+          <option value="HOSP12">HOSP12</option>
+          <option value="HOSP13">HOSP13</option>
+          <option value="HOSP14">HOSP14</option>
+          <option value="HOSP15">HOSP15</option>
+          <option value="HOSP16">HOSP16</option>
+          <option value="HOSP17">HOSP17</option>
+          <option value="HOSP18">HOSP18</option>
+          <option value="HOSP19">HOSP19</option>
+          <option value="HOSP20">HOSP20</option>
           </select>
         </div>
 
@@ -874,19 +926,7 @@
     }
   }
 
-  async function loadHospitalDropdown() {
-    try {
-      const res = await callBackend({ action: "getHospitals" });
-      const sel = document.getElementById("signup-hosp-id");
-      if (res.success && res.hospitals.length) {
-        sel.innerHTML = res.hospitals.map(h =>
-          `<option value="${h.hospitalId}">${h.hospitalName} (${h.hospitalId})</option>`
-        ).join("");
-      } else {
-        sel.innerHTML = `<option value="">No hospitals registered yet</option>`;
-      }
-    } catch (e) {}
-  }
+  // Hospital directory removed for strict privacy
 
   function switchAuthTab(tab) {
     const isLogin = tab === "login";
@@ -899,7 +939,7 @@
       ? "py-3 text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/40"
       : "py-3 text-slate-500 hover:text-slate-800";
     if (!isLogin) {
-      loadHospitalDropdown();
+      
       renderDeptCheckboxes("signup-dept-checkboxes", []);
     }
   }
@@ -909,7 +949,7 @@
     document.getElementById("field-new-hosp").classList.toggle("hidden", type !== "NEW_HOSPITAL");
     document.getElementById("field-existing-hosp").classList.toggle("hidden", type === "NEW_HOSPITAL");
     if (type === "EXISTING_HOSPITAL") {
-      loadHospitalDropdown();
+      
       renderDeptCheckboxes("signup-dept-checkboxes", []);
     }
   }
@@ -923,9 +963,10 @@
     btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin mr-1"></i> Signing in...`;
 
     try {
+      const hospitalId = document.getElementById("login-hosp-code").value.trim().toUpperCase();
       const username = document.getElementById("login-username").value;
       const password = document.getElementById("login-password").value;
-      const res = await callBackend({ action: "login", username, password });
+      const res = await callBackend({ action: "login", hospitalId, username, password });
       if (!res.success) {
         errBox.textContent = res.message;
         errBox.classList.remove("hidden");
@@ -950,6 +991,13 @@
     const signupType = document.getElementById("signup-type").value;
     const checkedDepts = Array.from(document.querySelectorAll("#signup-dept-checkboxes input:checked")).map(c => c.value);
 
+    const enteredHospCode = document.getElementById("signup-hosp-id").value.trim().toUpperCase();
+    if (signupType === "EXISTING_HOSPITAL" && !enteredHospCode) {
+      msgBox.textContent = "Please enter your Hospital Code (e.g., HOSP01).";
+      msgBox.className = "text-xs p-2.5 rounded-lg border font-medium bg-red-50 text-red-700 border-red-200";
+      msgBox.classList.remove("hidden");
+      return;
+    }
     if (signupType === "EXISTING_HOSPITAL" && checkedDepts.length === 0) {
       msgBox.textContent = "Please tick at least one Department.";
       msgBox.className = "text-xs p-2.5 rounded-lg border font-medium bg-red-50 text-red-700 border-red-200";
@@ -982,7 +1030,7 @@
       if (res.success) {
         e.target.reset();
         renderDeptCheckboxes("signup-dept-checkboxes", []);
-        loadHospitalDropdown();
+        
       }
     } finally {
       btn.disabled = false;
@@ -1882,6 +1930,23 @@
 
   function closeModal(id) {
     document.getElementById(id).classList.add("hidden");
+  }
+
+  // Auto-extend dropdown if more than 20 hospitals are registered in future
+  function ensureFutureHospitalCodes(maxCodeNum = 20) {
+    ["login-hosp-code", "signup-hosp-id"].forEach(id => {
+      const sel = document.getElementById(id);
+      if (!sel) return;
+      for (let i = 21; i <= maxCodeNum; i++) {
+        const code = "HOSP" + String(i).padStart(2, "0");
+        if (!Array.from(sel.options).some(o => o.value === code)) {
+          const opt = document.createElement("option");
+          opt.value = code;
+          opt.textContent = code;
+          sel.appendChild(opt);
+        }
+      }
+    });
   }
 
   window.onload = function() {
