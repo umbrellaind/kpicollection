@@ -35,16 +35,16 @@
 </div>
 
 <!-- ===================================================================== -->
-<!-- VIEW 1: LOGIN & NEW HOSPITAL / STAFF SIGNUP                           -->
+<!-- VIEW 1: LOGIN & NEW HOSPITAL / MULTI-DEPT STAFF SIGNUP                -->
 <!-- ===================================================================== -->
 <div id="auth-view" class="min-h-screen flex items-center justify-center p-4">
-  <div class="bg-white w-full max-w-md rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+  <div class="bg-white w-full max-w-lg rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
     <div class="bg-slate-900 text-white p-6 text-center">
       <div class="w-12 h-12 bg-indigo-600 rounded-xl mx-auto flex items-center justify-center text-xl font-bold mb-3">
         <i class="fa-solid fa-hospital-user"></i>
       </div>
       <h1 class="text-xl font-bold">NABH Clinical Quality & KPI Portal</h1>
-      <p class="text-xs text-slate-400 mt-1">6-Month Indicator Tracking, RCPA & Multi-Hospital Quality System</p>
+      <p class="text-xs text-slate-400 mt-1">Mobile-ID Login • Multi-Department Access • 6-Month KPI & RCPA System</p>
     </div>
 
     <!-- Auth Tabs -->
@@ -57,12 +57,14 @@
       </button>
     </div>
 
-    <!-- LOGIN FORM -->
+    <!-- LOGIN FORM (MOBILE NUMBER AS USER ID) -->
     <form id="login-form" onsubmit="handleLoginSubmit(event)" class="p-6 space-y-4">
       <div>
-        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Username</label>
-        <input type="text" id="login-username" required placeholder="Enter your username"
-               class="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">
+          <i class="fa-solid fa-mobile-screen-button text-indigo-600 mr-1"></i> Mobile Number (User ID)
+        </label>
+        <input type="text" id="login-username" required placeholder="Enter 10-digit Mobile Number"
+               class="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-indigo-500 outline-none" />
       </div>
       <div>
         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Password</label>
@@ -74,17 +76,17 @@
         Sign In to Portal
       </button>
       <p class="text-[11px] text-center text-slate-400">
-        New hospital or department staff? Switch to <b>Register / Signup</b> above.
+        New hospital or staff? Switch to <b>Register / Signup</b> above using your 10-digit Mobile Number.
       </p>
     </form>
 
-    <!-- SIGNUP FORM -->
-    <form id="signup-form" onsubmit="handleSignupSubmit(event)" class="hidden p-6 space-y-3.5">
+    <!-- SIGNUP FORM (MULTI-DEPARTMENT CHECKBOXES + MOBILE USER ID) -->
+    <form id="signup-form" onsubmit="handleSignupSubmit(event)" class="hidden p-6 space-y-3.5 max-h-[82vh] overflow-y-auto">
       <div>
         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Registration Type</label>
-        <select id="signup-type" onchange="toggleSignupFields()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+        <select id="signup-type" onchange="toggleSignupFields()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white font-medium">
           <option value="NEW_HOSPITAL">New Hospital Registration (Hospital Admin)</option>
-          <option value="EXISTING_HOSPITAL">Department User (Select Existing Hospital)</option>
+          <option value="EXISTING_HOSPITAL">Hospital Staff / Department Incharge (Multi-Dept)</option>
         </select>
       </div>
 
@@ -97,44 +99,32 @@
       <div id="field-existing-hosp" class="hidden space-y-3">
         <div>
           <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Select Your Hospital</label>
-          <select id="signup-hosp-id" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+          <select id="signup-hosp-id" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white font-semibold">
             <option value="">Loading hospitals...</option>
           </select>
         </div>
+
         <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Select Department</label>
-          <select id="signup-dept" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
-            <option value="ICU / Critical Care">ICU / Critical Care</option>
-            <option value="IPD / Nursing">IPD / Nursing</option>
-            <option value="Operation Theatre (OT)">Operation Theatre (OT)</option>
-            <option value="Diagnostics (Lab & Radiology)">Diagnostics (Lab & Radiology)</option>
-            <option value="Pharmacy & Nursing">Pharmacy & Nursing</option>
-            <option value="Infection Control (IPC)">Infection Control (IPC)</option>
-            <option value="Emergency Medicine">Emergency Medicine</option>
-            <option value="Blood Bank">Blood Bank</option>
-            <option value="OPD / Front Office">OPD / Front Office</option>
-            <option value="Billing & MRD">Billing & MRD</option>
-            <option value="Quality & Safety">Quality & Safety</option>
-            <option value="Cardiology">Cardiology</option>
-            <option value="Neurology">Neurology</option>
-            <option value="Obstetrics">Obstetrics</option>
-            <option value="Endocrinology">Endocrinology</option>
-            <option value="Nephrology">Nephrology</option>
-          </select>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-bold text-slate-600 uppercase">Select Departments (Tick 1 or More)</label>
+            <button type="button" onclick="toggleAllSignupDepts()" class="text-[11px] text-indigo-600 font-bold hover:underline">Select / Clear All</button>
+          </div>
+          <div id="signup-dept-checkboxes" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-40 overflow-y-auto p-2.5 border border-slate-300 rounded-lg bg-slate-50 text-xs">
+          </div>
         </div>
       </div>
 
       <div>
         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Your Full Name & Designation</label>
-        <input type="text" id="signup-fullname" required placeholder="e.g., Dr. Sharma / Sister Anjali"
+        <input type="text" id="signup-fullname" required placeholder="e.g., Dr. Sharma / Sister Anjali (ICN)"
                class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
       </div>
 
       <div class="grid grid-cols-2 gap-2.5">
         <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Create Username</label>
-          <input type="text" id="signup-username" required placeholder="username"
-                 class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">10-Digit Mobile (User ID)</label>
+          <input type="tel" id="signup-username" required maxlength="10" pattern="[0-9]{10}" placeholder="e.g., 9876543210"
+                 class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold" />
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Create Password</label>
@@ -171,8 +161,8 @@
             <span id="hdr-hosp-id" class="text-[11px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded border">HOSP01</span>
           </div>
           <p class="text-xs text-slate-500">
-            Logged in as: <b id="hdr-user-name" class="text-slate-700">User</b> •
-            Dept: <b id="hdr-dept" class="text-indigo-600">ALL</b> •
+            <b id="hdr-user-name" class="text-slate-700">User</b> (<span id="hdr-mobile-id" class="font-mono">Mobile</span>) •
+            Access: <b id="hdr-dept" class="text-indigo-600">ALL</b> •
             Role: <span id="hdr-role-badge" class="font-semibold">Admin</span>
           </p>
         </div>
@@ -219,7 +209,7 @@
         <i class="fa-solid fa-lock text-amber-600 text-base"></i>
         <span>
           <b>Super-Admin Approval Pending (FALSE):</b> Master Admin has not set <code>Admin_Approved = TRUE</code> for this hospital yet.
-          Letterhead upload, Data Approval, and Delete privileges are locked until approved.
+          Letterhead upload, Data Approval, Staff Access editing, and Delete privileges are locked until approved.
         </span>
       </div>
     </div>
@@ -228,7 +218,7 @@
   <!-- MAIN CONTENT CONTAINER -->
   <main class="max-w-7xl mx-auto w-full p-4 flex-1 space-y-4">
 
-    <!-- LETTERHEAD PREVIEW STRIP (If uploaded by Admin) -->
+    <!-- LETTERHEAD PREVIEW STRIP -->
     <div id="live-letterhead-box" class="hidden bg-white p-2 rounded-xl border border-slate-200 shadow-xs text-center no-print">
       <img id="live-letterhead-img" src="" alt="Hospital Letterhead" class="max-h-24 mx-auto object-contain" />
     </div>
@@ -236,30 +226,33 @@
     <!-- NAVIGATION TABS -->
     <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2 no-print">
       <div class="flex flex-wrap gap-1.5">
-        <button onclick="switchMainTab('kpi')" id="mtab-kpi" class="px-4 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-xs">
-          <i class="fa-solid fa-table-cells mr-1.5"></i> 6-Month KPI Data Grid
+        <button onclick="switchMainTab('kpi')" id="mtab-kpi" class="px-3.5 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-xs">
+          <i class="fa-solid fa-table-cells mr-1"></i> 6-Month KPI Grid
         </button>
-        <button onclick="switchMainTab('pending')" id="mtab-pending" class="hidden px-4 py-2 rounded-lg text-xs font-bold bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100">
-          <i class="fa-solid fa-hourglass-half mr-1.5"></i> Pending Approvals (<span id="pending-count">0</span>)
+        <button onclick="switchMainTab('pending')" id="mtab-pending" class="hidden px-3.5 py-2 rounded-lg text-xs font-bold bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100">
+          <i class="fa-solid fa-hourglass-half mr-1"></i> Pending Approvals (<span id="pending-count">0</span>)
         </button>
-        <button onclick="switchMainTab('rcpa')" id="mtab-rcpa" class="px-4 py-2 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
-          <i class="fa-solid fa-screwdriver-wrench mr-1.5"></i> Department RCPA Logs (<span id="rcpa-count">0</span>)
+        <button onclick="switchMainTab('rcpa')" id="mtab-rcpa" class="px-3.5 py-2 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
+          <i class="fa-solid fa-screwdriver-wrench mr-1"></i> RCPA Logs (<span id="rcpa-count">0</span>)
         </button>
-        <button onclick="switchMainTab('branding')" id="mtab-branding" class="hidden px-4 py-2 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
-          <i class="fa-solid fa-image mr-1.5"></i> Letterhead & Logo Setup
+        <button onclick="switchMainTab('staff')" id="mtab-staff" class="hidden px-3.5 py-2 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
+          <i class="fa-solid fa-users-gear mr-1"></i> Staff & Dept Access
         </button>
-        <button onclick="switchMainTab('audit')" id="mtab-audit" class="hidden px-4 py-2 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
-          <i class="fa-solid fa-shield-halved mr-1.5"></i> Security & Delete Audit Logs
+        <button onclick="switchMainTab('branding')" id="mtab-branding" class="hidden px-3.5 py-2 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
+          <i class="fa-solid fa-image mr-1"></i> Letterhead & Logo
+        </button>
+        <button onclick="switchMainTab('audit')" id="mtab-audit" class="hidden px-3.5 py-2 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
+          <i class="fa-solid fa-shield-halved mr-1"></i> Audit Logs
         </button>
       </div>
 
       <!-- Search & Dept Filter -->
       <div class="flex items-center gap-2">
         <select id="filter-dept" onchange="renderKPITable()" class="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-medium">
-          <option value="ALL">All Departments</option>
+          <option value="ALL">All Assigned Departments</option>
         </select>
         <input type="text" id="search-kpi" onkeyup="renderKPITable()" placeholder="Search indicator..."
-               class="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs w-48" />
+               class="px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs w-44" />
       </div>
     </div>
 
@@ -304,11 +297,9 @@
     <!-- SECTION A2: DIRECT PENDING APPROVALS QUEUE (ADMIN ONLY)             -->
     <!-- =================================================================== -->
     <section id="sec-pending" class="hidden bg-white rounded-xl border border-slate-200 shadow-xs p-4 space-y-3">
-      <div class="border-b pb-2.5 flex items-center justify-between">
-        <div>
-          <h2 class="font-bold text-base text-slate-900"><i class="fa-solid fa-hourglass-half text-amber-500 mr-1.5"></i> Department Entries Awaiting Admin Approval</h2>
-          <p class="text-xs text-slate-500">Review Numerator/Denominator submitted by department staff and Approve or Delete in one click.</p>
-        </div>
+      <div class="border-b pb-2.5">
+        <h2 class="font-bold text-base text-slate-900"><i class="fa-solid fa-hourglass-half text-amber-500 mr-1.5"></i> Department Entries Awaiting Admin Approval</h2>
+        <p class="text-xs text-slate-500">Review Numerator/Denominator submitted by department staff and Approve or Delete in one click.</p>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse text-xs">
@@ -360,6 +351,30 @@
     </section>
 
     <!-- =================================================================== -->
+    <!-- SECTION B2: HOSPITAL ADMIN STAFF & MULTI-DEPT ACCESS MANAGER        -->
+    <!-- =================================================================== -->
+    <section id="sec-staff" class="hidden bg-white rounded-xl border border-slate-200 shadow-xs p-4 space-y-3">
+      <div class="border-b pb-2.5">
+        <h2 class="font-bold text-base text-slate-900"><i class="fa-solid fa-users-gear text-indigo-600 mr-1.5"></i> Manage Staff Multi-Department & Indicator Access</h2>
+        <p class="text-xs text-slate-500">Assign multiple departments or specific KPI numbers (e.g. <code>KPI: 13, 17, 30</code>) to any hospital staff member.</p>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="bg-slate-900 text-white">
+              <th class="p-2.5">Staff Name</th>
+              <th class="p-2.5">Mobile Number (User ID)</th>
+              <th class="p-2.5">Role</th>
+              <th class="p-2.5">Assigned Departments / KPIs</th>
+              <th class="p-2.5 text-center">Edit Access</th>
+            </tr>
+          </thead>
+          <tbody id="staff-tbody" class="divide-y divide-slate-200"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
     <!-- SECTION C: LETTERHEAD & LOGO SETUP (ADMIN + APPROVED ONLY)          -->
     <!-- =================================================================== -->
     <section id="sec-branding" class="hidden bg-white rounded-xl border border-slate-200 shadow-xs p-6 max-w-2xl mx-auto space-y-5">
@@ -404,14 +419,14 @@
     <section id="sec-audit" class="hidden bg-white rounded-xl border border-slate-200 shadow-xs p-4 space-y-3">
       <div class="border-b pb-2.5">
         <h2 class="font-bold text-base text-slate-900"><i class="fa-solid fa-shield-halved text-emerald-600 mr-1.5"></i> Immutable Security & Deletion Audit Log</h2>
-        <p class="text-xs text-slate-500">Every entry creation, approval, letterhead change, and deletion is permanently recorded with username & timestamp.</p>
+        <p class="text-xs text-slate-500">Every entry creation, approval, letterhead change, and deletion is permanently recorded with Mobile ID & timestamp.</p>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse text-xs">
           <thead>
             <tr class="bg-slate-900 text-white">
               <th class="p-2.5">Timestamp (IST)</th>
-              <th class="p-2.5">User</th>
+              <th class="p-2.5">User / Mobile ID</th>
               <th class="p-2.5">Department</th>
               <th class="p-2.5">Action</th>
               <th class="p-2.5">Record ID</th>
@@ -466,7 +481,6 @@
 
       <div id="em-meta-info" class="hidden text-[11px] text-slate-500 bg-slate-100 p-2 rounded"></div>
 
-      <!-- Action Buttons -->
       <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t">
         <div id="em-admin-controls" class="hidden flex items-center gap-2">
           <button type="button" onclick="approveEntryById(ACTIVE_CELL.existing.entryId)" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold">
@@ -528,21 +542,76 @@
 </div>
 
 <!-- ===================================================================== -->
+<!-- MODAL 3: EDIT STAFF MULTI-DEPARTMENT / KPI ACCESS (ADMIN ONLY)        -->
+<!-- ===================================================================== -->
+<div id="staff-modal" class="hidden fixed inset-0 bg-slate-900/60 z-40 flex items-center justify-center p-4">
+  <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+    <div class="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
+      <div>
+        <span class="text-[11px] bg-indigo-600 px-2 py-0.5 rounded font-bold">Staff Access Control</span>
+        <h3 id="sm-staff-title" class="font-bold text-sm mt-1">Staff Name</h3>
+      </div>
+      <button onclick="closeModal('staff-modal')" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="p-5 space-y-4 text-xs">
+      <div>
+        <label class="block font-bold text-slate-700 mb-1.5">1. Tick Assigned Departments (Multiple Allowed):</label>
+        <div id="sm-dept-checkboxes" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-48 overflow-y-auto p-2.5 border border-slate-300 rounded-lg bg-slate-50">
+        </div>
+      </div>
+      <div>
+        <label class="block font-bold text-slate-700 mb-1">2. Optional: Add Specific KPI Numbers (Comma-separated)</label>
+        <input type="text" id="sm-extra-kpis" placeholder="e.g., KPI: 13, 17, 30"
+               class="w-full px-3 py-2 border border-slate-300 rounded-lg font-mono" />
+        <p class="text-[11px] text-slate-400 mt-1">Use this if the staff also needs access to individual indicators outside their ticked departments.</p>
+      </div>
+      <div class="flex justify-end gap-2 pt-2 border-t">
+        <button type="button" onclick="closeModal('staff-modal')" class="px-4 py-2 bg-slate-100 rounded-lg font-bold">Cancel</button>
+        <button type="button" onclick="saveStaffAccess()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg font-bold">Save Staff Access</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================================================================== -->
 <!-- JAVASCRIPT APPLICATION LOGIC                                          -->
 <!-- ===================================================================== -->
 <script>
+  const ALL_DEPARTMENTS_MASTER = [
+    "ICU / Critical Care",
+    "IPD / Nursing",
+    "Operation Theatre (OT)",
+    "Diagnostics (Lab & Radiology)",
+    "Pharmacy & Nursing",
+    "Infection Control (IPC)",
+    "Emergency Medicine",
+    "Blood Bank",
+    "OPD / Front Office",
+    "Billing & MRD",
+    "Quality & Safety",
+    "Cardiology",
+    "Neurology",
+    "Obstetrics",
+    "Endocrinology",
+    "Nephrology"
+  ];
+
   let CURRENT_USER = null;
   let STATE = {
     adminApproved: false,
     hospitalName: "",
     logoUrl: "",
     letterheadUrl: "",
+    liveUserDept: "",
+    allDepartments: [],
     indicators: [],
     entries: [],
     rcpas: [],
-    auditLogs: []
+    auditLogs: [],
+    hospitalUsers: []
   };
   let ACTIVE_CELL = null;
+  let EDITING_STAFF = null;
 
   function getLast6Months() {
     const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -555,6 +624,24 @@
     return list;
   }
   const LAST_6_MONTHS = getLast6Months();
+
+  function renderDeptCheckboxes(containerId, selectedList = []) {
+    const box = document.getElementById(containerId);
+    const normSelected = selectedList.map(s => s.trim().toLowerCase());
+    box.innerHTML = ALL_DEPARTMENTS_MASTER.map(d => {
+      const checked = normSelected.includes(d.toLowerCase()) ? "checked" : "";
+      return `<label class="flex items-center gap-2 p-1.5 rounded hover:bg-white cursor-pointer select-none">
+        <input type="checkbox" value="${d}" ${checked} class="rounded text-indigo-600 focus:ring-indigo-500" />
+        <span class="text-slate-700 font-medium">${d}</span>
+      </label>`;
+    }).join("");
+  }
+
+  function toggleAllSignupDepts() {
+    const inputs = document.querySelectorAll("#signup-dept-checkboxes input[type='checkbox']");
+    const allChecked = Array.from(inputs).every(i => i.checked);
+    inputs.forEach(i => i.checked = !allChecked);
+  }
 
   async function callBackend(payload, silent = false) {
     if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes("YOUR_GOOGLE_APPS_SCRIPT")) {
@@ -573,7 +660,6 @@
     }
   }
 
-  // Load Hospital List into Signup Dropdown
   async function loadHospitalDropdown() {
     try {
       const res = await callBackend({ action: "getHospitals" }, true);
@@ -598,14 +684,20 @@
     document.getElementById("tab-signup").className = !isLogin
       ? "py-3 text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/40"
       : "py-3 text-slate-500 hover:text-slate-800";
-    if (!isLogin) loadHospitalDropdown();
+    if (!isLogin) {
+      loadHospitalDropdown();
+      renderDeptCheckboxes("signup-dept-checkboxes", []);
+    }
   }
 
   function toggleSignupFields() {
     const type = document.getElementById("signup-type").value;
     document.getElementById("field-new-hosp").classList.toggle("hidden", type !== "NEW_HOSPITAL");
     document.getElementById("field-existing-hosp").classList.toggle("hidden", type === "NEW_HOSPITAL");
-    if (type === "EXISTING_HOSPITAL") loadHospitalDropdown();
+    if (type === "EXISTING_HOSPITAL") {
+      loadHospitalDropdown();
+      renderDeptCheckboxes("signup-dept-checkboxes", []);
+    }
   }
 
   async function handleLoginSubmit(e) {
@@ -631,12 +723,22 @@
     const msgBox = document.getElementById("signup-msg");
     msgBox.classList.add("hidden");
 
+    const signupType = document.getElementById("signup-type").value;
+    const checkedDepts = Array.from(document.querySelectorAll("#signup-dept-checkboxes input:checked")).map(c => c.value);
+
+    if (signupType === "EXISTING_HOSPITAL" && checkedDepts.length === 0) {
+      msgBox.textContent = "Please tick at least one Department.";
+      msgBox.className = "text-xs p-2.5 rounded-lg border font-medium bg-red-50 text-red-700 border-red-200";
+      msgBox.classList.remove("hidden");
+      return;
+    }
+
     const payload = {
       action: "signup",
-      signupType: document.getElementById("signup-type").value,
+      signupType: signupType,
       hospitalName: document.getElementById("signup-hosp-name").value,
       hospitalId: document.getElementById("signup-hosp-id").value,
-      department: document.getElementById("signup-dept").value,
+      department: signupType === "NEW_HOSPITAL" ? "ALL" : checkedDepts.join(", "),
       fullName: document.getElementById("signup-fullname").value,
       username: document.getElementById("signup-username").value,
       password: document.getElementById("signup-password").value
@@ -650,6 +752,7 @@
     msgBox.classList.remove("hidden");
     if (res.success) {
       e.target.reset();
+      renderDeptCheckboxes("signup-dept-checkboxes", []);
       loadHospitalDropdown();
     }
   }
@@ -679,16 +782,20 @@
       action: "getDashboardData",
       hospitalId: CURRENT_USER.hospitalId,
       role: CURRENT_USER.role,
+      username: CURRENT_USER.username,
       department: CURRENT_USER.department
     });
     if (!res.success) return alert(res.message);
 
     STATE = res;
+    if (res.liveUserDept) CURRENT_USER.department = res.liveUserDept;
+
     applyBrandingAndPermissions();
     populateDeptDropdown();
     renderKPITable();
     renderPendingTable();
     renderRCPATable();
+    renderStaffTable();
     renderAuditTable();
   }
 
@@ -699,6 +806,7 @@
     document.getElementById("brand-hosp-name").value = hName;
     document.getElementById("hdr-hosp-id").textContent = CURRENT_USER.hospitalId;
     document.getElementById("hdr-user-name").textContent = CURRENT_USER.fullName;
+    document.getElementById("hdr-mobile-id").textContent = CURRENT_USER.username;
     document.getElementById("hdr-dept").textContent = CURRENT_USER.department;
     document.getElementById("hdr-role-badge").textContent = CURRENT_USER.role;
 
@@ -726,6 +834,7 @@
 
     const isAdmin = CURRENT_USER.role === "Admin";
     document.getElementById("mtab-pending").classList.toggle("hidden", !isAdmin);
+    document.getElementById("mtab-staff").classList.toggle("hidden", !isAdmin);
     document.getElementById("mtab-branding").classList.toggle("hidden", !isAdmin);
     document.getElementById("mtab-audit").classList.toggle("hidden", !isAdmin);
 
@@ -741,7 +850,7 @@
   function populateDeptDropdown() {
     const sel = document.getElementById("filter-dept");
     const depts = [...new Set(STATE.indicators.map(i => i.department))];
-    sel.innerHTML = `<option value="ALL">All Departments (${STATE.indicators.length})</option>` +
+    sel.innerHTML = `<option value="ALL">All Assigned (${STATE.indicators.length} KPIs)</option>` +
       depts.map(d => `<option value="${d}">${d}</option>`).join("");
   }
 
@@ -794,7 +903,6 @@
     }).join("");
   }
 
-  // Render Direct Pending Approvals Queue for Admin
   function renderPendingTable() {
     const pending = STATE.entries.filter(e => e.approvalStatus !== "Approved");
     document.getElementById("pending-count").textContent = pending.length;
@@ -823,6 +931,80 @@
         </td>
       </tr>
     `).join("");
+  }
+
+  // Staff Multi-Dept Access Table & Modal
+  function renderStaffTable() {
+    const tbody = document.getElementById("staff-tbody");
+    if (!STATE.hospitalUsers || !STATE.hospitalUsers.length) {
+      tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">No staff users found.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = STATE.hospitalUsers.map(u => `
+      <tr class="hover:bg-slate-50">
+        <td class="p-2.5 font-bold text-slate-900">${u.fullName}</td>
+        <td class="p-2.5 font-mono text-indigo-700 font-semibold">${u.username}</td>
+        <td class="p-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.role === 'Admin' ? 'bg-purple-100 text-purple-800' : 'bg-slate-100 text-slate-700'}">${u.role}</span></td>
+        <td class="p-2.5 font-medium text-slate-700">${u.department}</td>
+        <td class="p-2.5 text-center">
+          ${u.role === 'Admin'
+            ? `<span class="text-[11px] text-slate-400">Full Access</span>`
+            : (STATE.adminApproved
+                ? `<button onclick='openStaffModal("${u.username}")' class="px-3 py-1 bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 border border-indigo-200 rounded text-[11px] font-bold transition">
+                    <i class="fa-solid fa-pen-to-square mr-1"></i> Edit Depts / KPIs
+                  </button>`
+                : `<span class="text-[11px] text-amber-700"><i class="fa-solid fa-lock"></i> Locked</span>`)}
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  function openStaffModal(username) {
+    const userObj = STATE.hospitalUsers.find(u => u.username === username);
+    if (!userObj) return;
+    EDITING_STAFF = userObj;
+    document.getElementById("sm-staff-title").textContent = `${userObj.fullName} (Mobile ID: ${userObj.username})`;
+
+    const tokens = userObj.department.split(",").map(t => t.trim()).filter(Boolean);
+    const deptTokens = [];
+    const kpiTokens = [];
+    tokens.forEach(t => {
+      if (/^(?:KPI\s*:?\s*)?\d+$/i.test(t)) kpiTokens.push(t);
+      else deptTokens.push(t);
+    });
+
+    renderDeptCheckboxes("sm-dept-checkboxes", deptTokens);
+    document.getElementById("sm-extra-kpis").value = kpiTokens.join(", ");
+    document.getElementById("staff-modal").classList.remove("hidden");
+  }
+
+  async function saveStaffAccess() {
+    if (!EDITING_STAFF) return;
+    const checkedDepts = Array.from(document.querySelectorAll("#sm-dept-checkboxes input:checked")).map(c => c.value);
+    const extraKpis = document.getElementById("sm-extra-kpis").value.trim();
+
+    const combined = [...checkedDepts];
+    if (extraKpis) combined.push(extraKpis);
+
+    if (combined.length === 0) {
+      return alert("Please select at least one Department or enter KPI numbers.");
+    }
+
+    const res = await callBackend({
+      action: "updateUserDepartments",
+      hospitalId: CURRENT_USER.hospitalId,
+      hospitalName: STATE.hospitalName,
+      adminUsername: CURRENT_USER.username,
+      targetUsername: EDITING_STAFF.username,
+      newDepartments: combined.join(", ")
+    });
+
+    if (res.success) {
+      closeModal("staff-modal");
+      await loadDashboard();
+    } else {
+      alert(res.message);
+    }
   }
 
   function openEntryModal(sno, monthYear) {
@@ -876,6 +1058,7 @@
       hospitalId: CURRENT_USER.hospitalId,
       hospitalName: STATE.hospitalName || CURRENT_USER.hospitalName,
       username: CURRENT_USER.username,
+      enteredByLabel: `${CURRENT_USER.fullName} (${CURRENT_USER.username})`,
       monthYear: ACTIVE_CELL.monthYear,
       sno: ACTIVE_CELL.ind.sno,
       indicatorName: ACTIVE_CELL.ind.name,
@@ -898,7 +1081,7 @@
       action: "approveKPIEntry",
       hospitalId: CURRENT_USER.hospitalId,
       hospitalName: STATE.hospitalName,
-      username: CURRENT_USER.username,
+      username: `${CURRENT_USER.fullName} (${CURRENT_USER.username})`,
       entryId: entryId
     });
     if (res.success) {
@@ -910,12 +1093,12 @@
   }
 
   async function deleteEntryById(entryId) {
-    if (!confirm("Are you sure you want to delete this entry? This deletion will be logged with your username & timestamp.")) return;
+    if (!confirm("Are you sure you want to delete this entry? This deletion will be logged with your Mobile ID & timestamp.")) return;
     const res = await callBackend({
       action: "deleteKPIEntry",
       hospitalId: CURRENT_USER.hospitalId,
       hospitalName: STATE.hospitalName,
-      username: CURRENT_USER.username,
+      username: `${CURRENT_USER.fullName} (${CURRENT_USER.username})`,
       entryId: entryId
     });
     if (res.success) {
@@ -943,6 +1126,7 @@
       hospitalId: CURRENT_USER.hospitalId,
       hospitalName: STATE.hospitalName,
       username: CURRENT_USER.username,
+      enteredByLabel: `${CURRENT_USER.fullName} (${CURRENT_USER.username})`,
       monthYear: document.getElementById("rcpa-month").value,
       sno: sno,
       indicatorName: ind.name,
@@ -1018,7 +1202,7 @@
     const res = await callBackend({
       action: "updateBranding",
       hospitalId: CURRENT_USER.hospitalId,
-      username: CURRENT_USER.username,
+      username: `${CURRENT_USER.fullName} (${CURRENT_USER.username})`,
       hospitalName: document.getElementById("brand-hosp-name").value,
       logoUrl: TEMP_LOGO_B64 || STATE.logoUrl,
       letterheadUrl: TEMP_LH_B64 || STATE.letterheadUrl
@@ -1051,18 +1235,18 @@
   }
 
   function switchMainTab(tab) {
-    ["kpi", "pending", "rcpa", "branding", "audit"].forEach(t => {
+    ["kpi", "pending", "rcpa", "staff", "branding", "audit"].forEach(t => {
       document.getElementById("sec-" + t).classList.toggle("hidden", t !== tab);
       const btn = document.getElementById("mtab-" + t);
       if (btn && !btn.classList.contains("hidden")) {
         if (t === "pending") {
           btn.className = t === tab
-            ? "px-4 py-2 rounded-lg text-xs font-bold bg-amber-600 text-white shadow-xs"
-            : "px-4 py-2 rounded-lg text-xs font-bold bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100";
+            ? "px-3.5 py-2 rounded-lg text-xs font-bold bg-amber-600 text-white shadow-xs"
+            : "px-3.5 py-2 rounded-lg text-xs font-bold bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100";
         } else {
           btn.className = t === tab
-            ? "px-4 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-xs"
-            : "px-4 py-2 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50";
+            ? "px-3.5 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-xs"
+            : "px-3.5 py-2 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50";
         }
       }
     });
