@@ -23,7 +23,7 @@
 <!-- CONFIGURATION: PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL BELOW        -->
 <!-- ===================================================================== -->
 <script>
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4DqTDpTJ1XrmP8WpBFcNrv7XvnKvI_D-6gm5xhm9VhPMI6-8JCi54lUErudU_xFXz/exec";
+  const APPS_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
 </script>
 
 <!-- LOADING OVERLAY -->
@@ -61,7 +61,7 @@
     <form id="login-form" onsubmit="handleLoginSubmit(event)" class="p-6 space-y-4">
       <div>
         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Username</label>
-        <input type="text" id="login-username" required placeholder="e.g., sky_admin or sky_icu"
+        <input type="text" id="login-username" required placeholder="Enter your username"
                class="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
       </div>
       <div>
@@ -84,7 +84,7 @@
         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Registration Type</label>
         <select id="signup-type" onchange="toggleSignupFields()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
           <option value="NEW_HOSPITAL">New Hospital Registration (Hospital Admin)</option>
-          <option value="EXISTING_HOSPITAL">Department User (Existing Hospital ID)</option>
+          <option value="EXISTING_HOSPITAL">Department User (Select Existing Hospital)</option>
         </select>
       </div>
 
@@ -96,9 +96,10 @@
 
       <div id="field-existing-hosp" class="hidden space-y-3">
         <div>
-          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Hospital ID (Given by Admin)</label>
-          <input type="text" id="signup-hosp-id" placeholder="e.g., HOSP01"
-                 class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm uppercase" />
+          <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Select Your Hospital</label>
+          <select id="signup-hosp-id" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+            <option value="">Loading hospitals...</option>
+          </select>
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Select Department</label>
@@ -145,7 +146,7 @@
       <div id="signup-msg" class="hidden text-xs p-2.5 rounded-lg border font-medium"></div>
 
       <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-lg text-sm transition">
-        Submit Registration (Requires Admin TRUE)
+        Submit Registration
       </button>
     </form>
   </div>
@@ -217,7 +218,7 @@
       <div class="flex items-center gap-2">
         <i class="fa-solid fa-lock text-amber-600 text-base"></i>
         <span>
-          <b>Super-Admin Approval Pending (FALSE):</b> Your Hospital ID is registered, but Master Admin has not set <code>Admin_Approved = TRUE</code> yet.
+          <b>Super-Admin Approval Pending (FALSE):</b> Master Admin has not set <code>Admin_Approved = TRUE</code> for this hospital yet.
           Letterhead upload, Data Approval, and Delete privileges are locked until approved.
         </span>
       </div>
@@ -237,6 +238,9 @@
       <div class="flex flex-wrap gap-1.5">
         <button onclick="switchMainTab('kpi')" id="mtab-kpi" class="px-4 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-xs">
           <i class="fa-solid fa-table-cells mr-1.5"></i> 6-Month KPI Data Grid
+        </button>
+        <button onclick="switchMainTab('pending')" id="mtab-pending" class="hidden px-4 py-2 rounded-lg text-xs font-bold bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100">
+          <i class="fa-solid fa-hourglass-half mr-1.5"></i> Pending Approvals (<span id="pending-count">0</span>)
         </button>
         <button onclick="switchMainTab('rcpa')" id="mtab-rcpa" class="px-4 py-2 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">
           <i class="fa-solid fa-screwdriver-wrench mr-1.5"></i> Department RCPA Logs (<span id="rcpa-count">0</span>)
@@ -282,7 +286,6 @@
               <th class="p-2.5 border-r border-slate-700 w-10 text-center">#</th>
               <th class="p-2.5 border-r border-slate-700 min-w-[240px]">Indicator & Department</th>
               <th class="p-2.5 border-r border-slate-700 text-center w-24">Unit</th>
-              <!-- Last 6 Months Dynamic Headers -->
               <th id="m-hdr-0" class="p-2.5 border-r border-slate-700 text-center min-w-[115px]">M1</th>
               <th id="m-hdr-1" class="p-2.5 border-r border-slate-700 text-center min-w-[115px]">M2</th>
               <th id="m-hdr-2" class="p-2.5 border-r border-slate-700 text-center min-w-[115px]">M3</th>
@@ -293,6 +296,34 @@
             </tr>
           </thead>
           <tbody id="kpi-tbody" class="divide-y divide-slate-200"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- SECTION A2: DIRECT PENDING APPROVALS QUEUE (ADMIN ONLY)             -->
+    <!-- =================================================================== -->
+    <section id="sec-pending" class="hidden bg-white rounded-xl border border-slate-200 shadow-xs p-4 space-y-3">
+      <div class="border-b pb-2.5 flex items-center justify-between">
+        <div>
+          <h2 class="font-bold text-base text-slate-900"><i class="fa-solid fa-hourglass-half text-amber-500 mr-1.5"></i> Department Entries Awaiting Admin Approval</h2>
+          <p class="text-xs text-slate-500">Review Numerator/Denominator submitted by department staff and Approve or Delete in one click.</p>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="bg-slate-900 text-white">
+              <th class="p-2.5">Month</th>
+              <th class="p-2.5">Department</th>
+              <th class="p-2.5">Indicator</th>
+              <th class="p-2.5 text-center">Num / Den</th>
+              <th class="p-2.5 text-center">Result</th>
+              <th class="p-2.5">Submitted By & Time</th>
+              <th class="p-2.5 text-center">Admin Action</th>
+            </tr>
+          </thead>
+          <tbody id="pending-tbody" class="divide-y divide-slate-200"></tbody>
         </table>
       </div>
     </section>
@@ -438,10 +469,10 @@
       <!-- Action Buttons -->
       <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t">
         <div id="em-admin-controls" class="hidden flex items-center gap-2">
-          <button type="button" onclick="approveCurrentEntry()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold">
+          <button type="button" onclick="approveEntryById(ACTIVE_CELL.existing.entryId)" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold">
             <i class="fa-solid fa-check-double mr-1"></i> Approve
           </button>
-          <button type="button" onclick="deleteCurrentEntry()" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold">
+          <button type="button" onclick="deleteEntryById(ACTIVE_CELL.existing.entryId)" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold">
             <i class="fa-solid fa-trash mr-1"></i> Delete
           </button>
         </div>
@@ -511,9 +542,8 @@
     rcpas: [],
     auditLogs: []
   };
-  let ACTIVE_CELL = null; // { ind, month, existingEntry }
+  let ACTIVE_CELL = null;
 
-  // Generate Last 6 Months dynamically (e.g., Jun 2026 to Nov 2026)
   function getLast6Months() {
     const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
     const list = [];
@@ -526,13 +556,12 @@
   }
   const LAST_6_MONTHS = getLast6Months();
 
-  // API Helper
-  async function callBackend(payload) {
+  async function callBackend(payload, silent = false) {
     if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes("YOUR_GOOGLE_APPS_SCRIPT")) {
       alert("Please paste your deployed Google Apps Script Web App URL in APPS_SCRIPT_URL inside index.html!");
       throw new Error("Missing Apps Script URL");
     }
-    document.getElementById("loader").classList.remove("hidden");
+    if (!silent) document.getElementById("loader").classList.remove("hidden");
     try {
       const res = await fetch(APPS_SCRIPT_URL, {
         method: "POST",
@@ -540,11 +569,25 @@
       });
       return await res.json();
     } finally {
-      document.getElementById("loader").classList.add("hidden");
+      if (!silent) document.getElementById("loader").classList.add("hidden");
     }
   }
 
-  // Auth Tab Switcher
+  // Load Hospital List into Signup Dropdown
+  async function loadHospitalDropdown() {
+    try {
+      const res = await callBackend({ action: "getHospitals" }, true);
+      const sel = document.getElementById("signup-hosp-id");
+      if (res.success && res.hospitals.length) {
+        sel.innerHTML = res.hospitals.map(h =>
+          `<option value="${h.hospitalId}">${h.hospitalName} (${h.hospitalId})</option>`
+        ).join("");
+      } else {
+        sel.innerHTML = `<option value="">No hospitals registered yet</option>`;
+      }
+    } catch (e) {}
+  }
+
   function switchAuthTab(tab) {
     const isLogin = tab === "login";
     document.getElementById("login-form").classList.toggle("hidden", !isLogin);
@@ -555,12 +598,14 @@
     document.getElementById("tab-signup").className = !isLogin
       ? "py-3 text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/40"
       : "py-3 text-slate-500 hover:text-slate-800";
+    if (!isLogin) loadHospitalDropdown();
   }
 
   function toggleSignupFields() {
     const type = document.getElementById("signup-type").value;
     document.getElementById("field-new-hosp").classList.toggle("hidden", type !== "NEW_HOSPITAL");
     document.getElementById("field-existing-hosp").classList.toggle("hidden", type === "NEW_HOSPITAL");
+    if (type === "EXISTING_HOSPITAL") loadHospitalDropdown();
   }
 
   async function handleLoginSubmit(e) {
@@ -603,7 +648,10 @@
       ? "text-xs p-2.5 rounded-lg border font-medium bg-emerald-50 text-emerald-800 border-emerald-200"
       : "text-xs p-2.5 rounded-lg border font-medium bg-red-50 text-red-700 border-red-200";
     msgBox.classList.remove("hidden");
-    if (res.success) e.target.reset();
+    if (res.success) {
+      e.target.reset();
+      loadHospitalDropdown();
+    }
   }
 
   function logout() {
@@ -617,7 +665,6 @@
     document.getElementById("auth-view").classList.add("hidden");
     document.getElementById("app-view").classList.remove("hidden");
 
-    // Set 6-month column headers
     LAST_6_MONTHS.forEach((m, idx) => {
       document.getElementById("m-hdr-" + idx).textContent = m;
     });
@@ -640,6 +687,7 @@
     applyBrandingAndPermissions();
     populateDeptDropdown();
     renderKPITable();
+    renderPendingTable();
     renderRCPATable();
     renderAuditTable();
   }
@@ -654,7 +702,6 @@
     document.getElementById("hdr-dept").textContent = CURRENT_USER.department;
     document.getElementById("hdr-role-badge").textContent = CURRENT_USER.role;
 
-    // Logo
     if (STATE.logoUrl) {
       document.getElementById("hdr-logo").src = STATE.logoUrl;
       document.getElementById("hdr-logo").classList.remove("hidden");
@@ -665,7 +712,6 @@
       document.getElementById("preview-logo").classList.remove("hidden");
     }
 
-    // Letterhead Banner
     if (STATE.letterheadUrl) {
       document.getElementById("live-letterhead-img").src = STATE.letterheadUrl;
       document.getElementById("live-letterhead-box").classList.remove("hidden");
@@ -676,15 +722,13 @@
       document.getElementById("preview-lh").classList.remove("hidden");
     }
 
-    // Lock Banner if Admin_Approved == FALSE
     document.getElementById("lock-banner").classList.toggle("hidden", STATE.adminApproved);
 
-    // Admin Tabs Visibility
     const isAdmin = CURRENT_USER.role === "Admin";
+    document.getElementById("mtab-pending").classList.toggle("hidden", !isAdmin);
     document.getElementById("mtab-branding").classList.toggle("hidden", !isAdmin);
     document.getElementById("mtab-audit").classList.toggle("hidden", !isAdmin);
 
-    // Branding Form Lock if Admin_Approved == FALSE
     document.getElementById("branding-locked-msg").classList.toggle("hidden", STATE.adminApproved);
     document.getElementById("btn-save-branding").disabled = !STATE.adminApproved;
     if (!STATE.adminApproved) {
@@ -750,7 +794,37 @@
     }).join("");
   }
 
-  // Entry Modal Functions
+  // Render Direct Pending Approvals Queue for Admin
+  function renderPendingTable() {
+    const pending = STATE.entries.filter(e => e.approvalStatus !== "Approved");
+    document.getElementById("pending-count").textContent = pending.length;
+    const tbody = document.getElementById("pending-tbody");
+    if (!pending.length) {
+      tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">No pending department entries! All data is up to date.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = pending.map(e => `
+      <tr class="hover:bg-amber-50/40">
+        <td class="p-2.5 font-bold">${e.monthYear}</td>
+        <td class="p-2.5 text-indigo-700 font-semibold">${e.department}</td>
+        <td class="p-2.5 font-semibold text-slate-900">#${e.sno}. ${e.indicatorName}</td>
+        <td class="p-2.5 text-center font-mono">${e.numerator} / ${e.denominator}</td>
+        <td class="p-2.5 text-center font-extrabold text-indigo-700">${e.result}</td>
+        <td class="p-2.5 text-[11px] text-slate-500"><b>${e.enteredBy}</b><br/>${e.entryTimestamp}</td>
+        <td class="p-2.5 text-center space-x-1">
+          ${STATE.adminApproved ? `
+            <button onclick="approveEntryById('${e.entryId}')" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[11px] font-bold">
+              <i class="fa-solid fa-check mr-1"></i> Approve
+            </button>
+            <button onclick="deleteEntryById('${e.entryId}')" class="px-2.5 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-[11px] font-bold">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          ` : `<span class="text-[11px] text-amber-700 font-semibold"><i class="fa-solid fa-lock"></i> Locked (FALSE)</span>`}
+        </td>
+      </tr>
+    `).join("");
+  }
+
   function openEntryModal(sno, monthYear) {
     const ind = STATE.indicators.find(i => Number(i.sno) === Number(sno));
     const existing = STATE.entries.find(e => Number(e.sno) === Number(sno) && e.monthYear === monthYear);
@@ -775,7 +849,6 @@
       metaBox.classList.add("hidden");
     }
 
-    // Show Approve/Delete buttons ONLY if role == Admin AND Admin_Approved == TRUE AND entry exists
     const canAdminAct = CURRENT_USER.role === "Admin" && STATE.adminApproved && Boolean(existing);
     document.getElementById("em-admin-controls").classList.toggle("hidden", !canAdminAct);
 
@@ -820,14 +893,13 @@
     }
   }
 
-  async function approveCurrentEntry() {
-    if (!ACTIVE_CELL || !ACTIVE_CELL.existing) return;
+  async function approveEntryById(entryId) {
     const res = await callBackend({
       action: "approveKPIEntry",
       hospitalId: CURRENT_USER.hospitalId,
       hospitalName: STATE.hospitalName,
       username: CURRENT_USER.username,
-      entryId: ACTIVE_CELL.existing.entryId
+      entryId: entryId
     });
     if (res.success) {
       closeModal("entry-modal");
@@ -837,15 +909,14 @@
     }
   }
 
-  async function deleteCurrentEntry() {
-    if (!ACTIVE_CELL || !ACTIVE_CELL.existing) return;
+  async function deleteEntryById(entryId) {
     if (!confirm("Are you sure you want to delete this entry? This deletion will be logged with your username & timestamp.")) return;
     const res = await callBackend({
       action: "deleteKPIEntry",
       hospitalId: CURRENT_USER.hospitalId,
       hospitalName: STATE.hospitalName,
       username: CURRENT_USER.username,
-      entryId: ACTIVE_CELL.existing.entryId
+      entryId: entryId
     });
     if (res.success) {
       closeModal("entry-modal");
@@ -855,7 +926,6 @@
     }
   }
 
-  // RCPA Modal & Rendering
   function openRCPAModal(sno) {
     document.getElementById("rcpa-month").innerHTML = LAST_6_MONTHS.map(m => `<option value="${m}">${m}</option>`).join("");
     document.getElementById("rcpa-indicator").innerHTML = STATE.indicators.map(i =>
@@ -911,7 +981,6 @@
     `).join("");
   }
 
-  // Letterhead & Logo Image Compression + Upload
   let TEMP_LOGO_B64 = "";
   let TEMP_LH_B64 = "";
 
@@ -922,7 +991,6 @@
     reader.onload = function(ev) {
       const img = new Image();
       img.onload = function() {
-        // Resize cleanly so it fits smoothly inside Google Sheet cell (<45,000 chars)
         const canvas = document.createElement("canvas");
         const maxW = imgId === "preview-lh" ? 900 : 250;
         const scale = Math.min(1, maxW / img.width);
@@ -983,13 +1051,19 @@
   }
 
   function switchMainTab(tab) {
-    ["kpi", "rcpa", "branding", "audit"].forEach(t => {
+    ["kpi", "pending", "rcpa", "branding", "audit"].forEach(t => {
       document.getElementById("sec-" + t).classList.toggle("hidden", t !== tab);
       const btn = document.getElementById("mtab-" + t);
-      if (btn) {
-        btn.className = t === tab
-          ? "px-4 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-xs"
-          : (btn.classList.contains("hidden") ? "hidden" : "px-4 py-2 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50");
+      if (btn && !btn.classList.contains("hidden")) {
+        if (t === "pending") {
+          btn.className = t === tab
+            ? "px-4 py-2 rounded-lg text-xs font-bold bg-amber-600 text-white shadow-xs"
+            : "px-4 py-2 rounded-lg text-xs font-bold bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100";
+        } else {
+          btn.className = t === tab
+            ? "px-4 py-2 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow-xs"
+            : "px-4 py-2 rounded-lg text-xs font-bold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50";
+        }
       }
     });
   }
@@ -998,7 +1072,6 @@
     document.getElementById(id).classList.add("hidden");
   }
 
-  // Auto-restore session if already logged in
   window.onload = function() {
     const saved = localStorage.getItem("nabh_kpi_user");
     if (saved) {
