@@ -45,7 +45,7 @@
         <i class="fa-solid fa-hospital-user"></i>
       </div>
       <h1 class="text-xl font-bold">NABH Clinical Quality & KPI Portal</h1>
-      <p class="text-xs text-slate-400 mt-1">Mobile-ID Login • Custom Benchmarks • Trend Graphs & RCPA System</p>
+      <p class="text-xs text-slate-400 mt-1">Sub-Unit / Ward Breakdown • Custom Benchmarks • Trend Graphs & RCPA</p>
     </div>
 
     <div class="grid grid-cols-2 border-b border-slate-200 text-sm font-semibold">
@@ -86,7 +86,7 @@
         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Registration Type</label>
         <select id="signup-type" onchange="toggleSignupFields()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white font-medium">
           <option value="NEW_HOSPITAL">New Hospital Registration (Hospital Admin)</option>
-          <option value="EXISTING_HOSPITAL">Hospital Staff / Department Incharge (Multi-Dept)</option>
+          <option value="EXISTING_HOSPITAL">Hospital Staff / Ward / Modality Incharge</option>
         </select>
       </div>
 
@@ -116,7 +116,7 @@
 
       <div>
         <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Your Full Name & Designation</label>
-        <input type="text" id="signup-fullname" required placeholder="e.g., Dr. Sharma / Sister Anjali (ICN)"
+        <input type="text" id="signup-fullname" required placeholder="e.g., Dr. Sharma / Sister Anjali (ICU)"
                class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
       </div>
 
@@ -192,7 +192,7 @@
         <img id="print-logo-img" src="" class="hidden w-14 h-14 object-contain" />
         <div>
           <h2 id="print-hosp-title" class="text-2xl font-bold uppercase text-slate-900">HOSPITAL NAME</h2>
-          <p class="text-xs text-slate-600">NABH Clinical Quality & Key Performance Indicators (6-Month Audit, Trend Graphs & RCPA Report)</p>
+          <p class="text-xs text-slate-600">NABH Clinical Quality & Key Performance Indicators (Consolidated 6-Month Audit, Trend Graphs & RCPA Report)</p>
         </div>
       </div>
       <div class="text-right text-xs text-slate-600">
@@ -263,16 +263,16 @@
     </div>
 
     <!-- =================================================================== -->
-    <!-- SECTION A: 6-MONTH KPI DATA GRID                                    -->
+    <!-- SECTION A: 6-MONTH KPI DATA GRID (AUTO-CONSOLIDATED ACROSS LOCATIONS) -->
     <!-- =================================================================== -->
     <section id="sec-kpi" class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
       <div class="p-3.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2 no-print">
         <div class="text-xs text-slate-600">
-          <i class="fa-solid fa-circle-info text-indigo-600 mr-1"></i>
-          Click any month cell to enter <b>Numerator & Denominator</b>. Red border indicates <b>Benchmark Breach</b>.
+          <i class="fa-solid fa-layer-group text-indigo-600 mr-1"></i>
+          Click any month cell to enter data by <b>Sub-Unit / Ward / Modality</b> (e.g. USG, CT, MRI, ICU, Pvt Ward). Grid shows <b>Auto-Consolidated Hospital Total</b>.
         </div>
         <div class="flex items-center gap-3 text-[11px] font-semibold">
-          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Approved (Within Target)</span>
+          <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> All Approved</span>
           <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Benchmark Breach</span>
           <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Pending</span>
         </div>
@@ -285,12 +285,12 @@
               <th class="p-2.5 border-r border-slate-700 w-10 text-center">#</th>
               <th class="p-2.5 border-r border-slate-700 min-w-[240px]">Indicator & Department</th>
               <th class="p-2.5 border-r border-slate-700 text-center w-24">Benchmark</th>
-              <th id="m-hdr-0" class="p-2.5 border-r border-slate-700 text-center min-w-[115px]">M1</th>
-              <th id="m-hdr-1" class="p-2.5 border-r border-slate-700 text-center min-w-[115px]">M2</th>
-              <th id="m-hdr-2" class="p-2.5 border-r border-slate-700 text-center min-w-[115px]">M3</th>
-              <th id="m-hdr-3" class="p-2.5 border-r border-slate-700 text-center min-w-[115px]">M4</th>
-              <th id="m-hdr-4" class="p-2.5 border-r border-slate-700 text-center min-w-[115px]">M5</th>
-              <th id="m-hdr-5" class="p-2.5 border-r border-slate-700 text-center min-w-[115px]">M6</th>
+              <th id="m-hdr-0" class="p-2.5 border-r border-slate-700 text-center min-w-[120px]">M1</th>
+              <th id="m-hdr-1" class="p-2.5 border-r border-slate-700 text-center min-w-[120px]">M2</th>
+              <th id="m-hdr-2" class="p-2.5 border-r border-slate-700 text-center min-w-[120px]">M3</th>
+              <th id="m-hdr-3" class="p-2.5 border-r border-slate-700 text-center min-w-[120px]">M4</th>
+              <th id="m-hdr-4" class="p-2.5 border-r border-slate-700 text-center min-w-[120px]">M5</th>
+              <th id="m-hdr-5" class="p-2.5 border-r border-slate-700 text-center min-w-[120px]">M6</th>
               <th class="p-2.5 text-center w-24 no-print">RCPA</th>
             </tr>
           </thead>
@@ -303,14 +303,13 @@
     <!-- SECTION G: 6-MONTH TREND GRAPHS & ANALYTICS                         -->
     <!-- =================================================================== -->
     <section id="sec-graphs" class="hidden space-y-4">
-      <!-- Summary KPI Cards -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
           <div class="text-[11px] font-bold text-slate-400 uppercase">Assigned Indicators</div>
           <div id="stat-total-kpis" class="text-2xl font-extrabold text-slate-900 mt-1">0</div>
         </div>
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
-          <div class="text-[11px] font-bold text-slate-400 uppercase">6-Month Entries Logged</div>
+          <div class="text-[11px] font-bold text-slate-400 uppercase">Sub-Unit Entries Logged</div>
           <div id="stat-total-entries" class="text-2xl font-extrabold text-indigo-600 mt-1">0</div>
         </div>
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
@@ -323,14 +322,12 @@
         </div>
       </div>
 
-      <!-- Charts Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <!-- Left 2 Cols: Indicator 6-Month Trend Chart with Benchmark Line -->
         <div class="lg:col-span-2 bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-3">
           <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-3">
             <div>
-              <h3 class="font-bold text-sm text-slate-900"><i class="fa-solid fa-chart-line text-indigo-600 mr-1.5"></i> 6-Month Indicator Performance Trend</h3>
-              <p class="text-[11px] text-slate-500">Blue line = Actual Monthly Result • Red dashed line = Hospital Benchmark Target</p>
+              <h3 class="font-bold text-sm text-slate-900"><i class="fa-solid fa-chart-line text-indigo-600 mr-1.5"></i> 6-Month Consolidated Indicator Trend</h3>
+              <p class="text-[11px] text-slate-500">Blue line = Consolidated Hospital Result • Red dashed line = Hospital Benchmark Target</p>
             </div>
             <select id="chart-kpi-select" onchange="renderTrendChart()" class="px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-bold bg-slate-50 max-w-xs">
             </select>
@@ -341,7 +338,6 @@
           <div id="chart-kpi-summary" class="bg-slate-50 p-3 rounded-lg border text-xs text-slate-700 flex flex-wrap justify-between gap-2"></div>
         </div>
 
-        <!-- Right Col: Department Submission Bar Chart -->
         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-3">
           <div class="border-b pb-3">
             <h3 class="font-bold text-sm text-slate-900"><i class="fa-solid fa-chart-column text-emerald-600 mr-1.5"></i> Department Data Submissions</h3>
@@ -394,15 +390,15 @@
     <!-- =================================================================== -->
     <section id="sec-pending" class="hidden bg-white rounded-xl border border-slate-200 shadow-xs p-4 space-y-3">
       <div class="border-b pb-2.5">
-        <h2 class="font-bold text-base text-slate-900"><i class="fa-solid fa-hourglass-half text-amber-500 mr-1.5"></i> Department Entries Awaiting Admin Approval</h2>
-        <p class="text-xs text-slate-500">Review Numerator/Denominator submitted by department staff and Approve or Delete in one click.</p>
+        <h2 class="font-bold text-base text-slate-900"><i class="fa-solid fa-hourglass-half text-amber-500 mr-1.5"></i> Sub-Unit Entries Awaiting Admin Approval</h2>
+        <p class="text-xs text-slate-500">Review Numerator/Denominator submitted from each Ward / Modality / Location and Approve or Delete in one click.</p>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse text-xs">
           <thead>
             <tr class="bg-slate-900 text-white">
               <th class="p-2.5">Month</th>
-              <th class="p-2.5">Department</th>
+              <th class="p-2.5">Location / Sub-Unit</th>
               <th class="p-2.5">Indicator</th>
               <th class="p-2.5 text-center">Num / Den</th>
               <th class="p-2.5 text-center">Result</th>
@@ -422,7 +418,7 @@
       <div class="flex items-center justify-between border-b pb-3">
         <div>
           <h2 class="font-bold text-base text-slate-900">Root Cause & Preventive Action (RCPA) Register</h2>
-          <p class="text-xs text-slate-500">Department-wise RCA, Corrective Action, and Preventive Action submissions</p>
+          <p class="text-xs text-slate-500">Location & Department-wise RCA, Corrective Action, and Preventive Action submissions</p>
         </div>
         <button onclick="openRCPAModal(null)" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold no-print">
           <i class="fa-solid fa-plus mr-1"></i> New RCPA Entry
@@ -433,8 +429,8 @@
           <thead>
             <tr class="bg-slate-100 text-slate-700 border-b">
               <th class="p-2.5">Month</th>
+              <th class="p-2.5">Location / Sub-Unit</th>
               <th class="p-2.5">Indicator</th>
-              <th class="p-2.5">Department</th>
               <th class="p-2.5">Root Cause</th>
               <th class="p-2.5">Corrective Action</th>
               <th class="p-2.5">Preventive Action</th>
@@ -515,7 +511,7 @@
     <section id="sec-audit" class="hidden bg-white rounded-xl border border-slate-200 shadow-xs p-4 space-y-3">
       <div class="border-b pb-2.5">
         <h2 class="font-bold text-base text-slate-900"><i class="fa-solid fa-shield-halved text-emerald-600 mr-1.5"></i> Immutable Security & Deletion Audit Log</h2>
-        <p class="text-xs text-slate-500">Every entry creation, approval, benchmark update, letterhead change, and deletion is permanently recorded.</p>
+        <p class="text-xs text-slate-500">Every sub-unit entry, approval, benchmark update, letterhead change, and deletion is permanently recorded.</p>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse text-xs">
@@ -538,10 +534,10 @@
 </div>
 
 <!-- ===================================================================== -->
-<!-- MODAL 1: NUMERATOR & DENOMINATOR ENTRY + ADMIN APPROVE / DELETE       -->
+<!-- MODAL 1: LOCATION / SUB-UNIT BREAKDOWN + NUMERATOR/DENOMINATOR ENTRY  -->
 <!-- ===================================================================== -->
 <div id="entry-modal" class="hidden fixed inset-0 bg-slate-900/60 z-40 flex items-center justify-center p-4">
-  <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+  <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden max-h-[92vh] flex flex-col">
     <div class="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
       <div>
         <span id="em-month-badge" class="text-[11px] bg-indigo-600 px-2 py-0.5 rounded font-bold">Nov 2026</span>
@@ -550,60 +546,96 @@
       <button onclick="closeModal('entry-modal')" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
     </div>
 
-    <div class="p-5 space-y-4">
-      <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs space-y-1.5">
+    <div class="p-5 space-y-4 overflow-y-auto">
+      <!-- Definition Box -->
+      <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs space-y-1">
         <p><b class="text-indigo-700">Numerator (अंश):</b> <span id="em-num-def"></span></p>
         <p><b class="text-emerald-700">Denominator (हर):</b> <span id="em-den-def"></span></p>
         <p class="text-[11px] text-slate-500 italic" id="em-hindi"></p>
       </div>
 
-      <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Numerator Value</label>
-          <input type="number" step="any" id="em-num-input" oninput="liveCalcResult()"
-                 class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold" />
+      <!-- Existing Sub-Unit / Location Breakdown List (If any entries exist for this month) -->
+      <div id="em-existing-list-box" class="hidden space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-slate-700"><i class="fa-solid fa-sitemap text-indigo-600 mr-1"></i> Recorded Sub-Units / Wards / Modalities for this Month:</span>
+          <span id="em-consolidated-pill" class="text-[11px] font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded"></span>
         </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Denominator Value</label>
-          <input type="number" step="any" id="em-den-input" oninput="liveCalcResult()"
-                 class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold" />
+        <div class="border border-slate-200 rounded-lg overflow-hidden">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-100 text-slate-700 border-b">
+              <tr>
+                <th class="p-2">Location / Sub-Unit</th>
+                <th class="p-2 text-center">Num / Den</th>
+                <th class="p-2 text-center">Result</th>
+                <th class="p-2 text-center">Status</th>
+                <th class="p-2 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="em-existing-tbody" class="divide-y divide-slate-200"></tbody>
+          </table>
         </div>
       </div>
 
-      <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-3 flex items-center justify-between">
-        <div>
-          <span class="text-xs font-bold text-indigo-900 block">Calculated KPI Result:</span>
-          <span id="em-bm-hint" class="text-[11px] text-slate-600"></span>
+      <!-- Add / Edit Sub-Unit Form -->
+      <div class="border-t pt-3 space-y-3">
+        <div class="flex items-center justify-between">
+          <h4 class="text-xs font-extrabold uppercase text-indigo-700" id="em-form-heading">
+            <i class="fa-solid fa-plus-circle mr-1"></i> Add / Update Sub-Unit Data
+          </h4>
         </div>
-        <span id="em-calc-preview" class="text-xl font-extrabold text-indigo-700">0</span>
-      </div>
 
-      <div id="em-meta-info" class="hidden text-[11px] text-slate-500 bg-slate-100 p-2 rounded"></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">1. Select Ward / Modality / Sub-Unit</label>
+            <select id="em-location-select" onchange="onLocationSelectChange()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold bg-white">
+            </select>
+          </div>
+          <div id="em-custom-loc-box" class="hidden">
+            <label class="block text-xs font-bold text-slate-700 mb-1">Enter Custom Location Name</label>
+            <input type="text" id="em-custom-loc-input" placeholder="e.g., NICU / Cath Lab / Ward-2"
+                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold" />
+          </div>
+        </div>
 
-      <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t">
-        <div id="em-admin-controls" class="hidden flex items-center gap-2">
-          <button type="button" onclick="approveEntryById(ACTIVE_CELL.existing.entryId)" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold">
-            <i class="fa-solid fa-check-double mr-1"></i> Approve
-          </button>
-          <button type="button" onclick="deleteEntryById(ACTIVE_CELL.existing.entryId)" class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold">
-            <i class="fa-solid fa-trash mr-1"></i> Delete
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">2. Numerator Value</label>
+            <input type="number" step="any" id="em-num-input" oninput="liveCalcResult()"
+                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">3. Denominator Value</label>
+            <input type="number" step="any" id="em-den-input" oninput="liveCalcResult()"
+                   class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-bold" />
+          </div>
+        </div>
+
+        <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-3 flex items-center justify-between">
+          <div>
+            <span class="text-xs font-bold text-indigo-900 block">Sub-Unit Calculated Result:</span>
+            <span id="em-bm-hint" class="text-[11px] text-slate-600"></span>
+          </div>
+          <span id="em-calc-preview" class="text-xl font-extrabold text-indigo-700">0</span>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-1">
+          <button type="button" onclick="closeModal('entry-modal')" class="px-4 py-2 bg-slate-100 rounded-lg text-xs font-bold">Close</button>
+          <button type="button" onclick="submitKPIEntry()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold">
+            <i class="fa-solid fa-floppy-disk mr-1"></i> Save Sub-Unit Entry (Pending Approval)
           </button>
         </div>
-        <button type="button" onclick="submitKPIEntry()" class="ml-auto px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold">
-          <i class="fa-solid fa-floppy-disk mr-1"></i> Save Data (Pending Approval)
-        </button>
       </div>
     </div>
   </div>
 </div>
 
 <!-- ===================================================================== -->
-<!-- MODAL 2: DEPARTMENT RCPA SUBMISSION                                   -->
+<!-- MODAL 2: DEPARTMENT RCPA SUBMISSION (WITH LOCATION)                   -->
 <!-- ===================================================================== -->
 <div id="rcpa-modal" class="hidden fixed inset-0 bg-slate-900/60 z-40 flex items-center justify-center p-4">
   <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
     <div class="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
-      <h3 class="font-bold text-sm"><i class="fa-solid fa-screwdriver-wrench mr-1.5 text-amber-400"></i> Submit Department RCPA</h3>
+      <h3 class="font-bold text-sm"><i class="fa-solid fa-screwdriver-wrench mr-1.5 text-amber-400"></i> Submit Location / Department RCPA</h3>
       <button onclick="closeModal('rcpa-modal')" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <form onsubmit="submitRCPAForm(event)" class="p-5 space-y-3.5 text-xs">
@@ -613,9 +645,14 @@
           <select id="rcpa-month" class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white"></select>
         </div>
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Select Indicator</label>
-          <select id="rcpa-indicator" class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white"></select>
+          <label class="block font-bold text-slate-700 mb-1">Ward / Modality / Sub-Unit</label>
+          <input type="text" id="rcpa-location" required placeholder="e.g., CT Scan / ICU / Pvt Ward"
+                 class="w-full px-3 py-2 border border-slate-300 rounded-lg font-semibold" />
         </div>
+      </div>
+      <div>
+        <label class="block font-bold text-slate-700 mb-1">Select Indicator</label>
+        <select id="rcpa-indicator" class="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white"></select>
       </div>
       <div>
         <label class="block font-bold text-slate-700 mb-1">1. Root Cause Analysis (RCA - कारण)</label>
@@ -694,6 +731,45 @@
     "Nephrology"
   ];
 
+  // Smart Sub-Unit / Location presets per Department
+  function getLocationsForIndicator(ind) {
+    const d = (ind.department || "").toLowerCase();
+    const sno = Number(ind.sno);
+    if (d.includes("diagnostic") || sno === 2 || sno === 3 || sno === 23 || sno === 39) {
+      return [
+        "Pathology Lab",
+        "Ultrasound (USG)",
+        "X-Ray",
+        "CT Scan",
+        "MRI",
+        "Overall / Consolidated",
+        "CUSTOM"
+      ];
+    }
+    if (ind.isShared || d.includes("pharmacy") || d.includes("nursing") || d.includes("infection") || d.includes("quality")) {
+      return [
+        "ICU",
+        "General Ward",
+        "Private Ward",
+        "Emergency (ED)",
+        "Operation Theatre (OT)",
+        "Pharmacy",
+        "OPD",
+        "Labour Room",
+        "Diagnostics (Lab & Radiology)",
+        "Overall / Consolidated",
+        "CUSTOM"
+      ];
+    }
+    if (d.includes("icu")) {
+      return ["Medical ICU (MICU)", "Surgical ICU (SICU)", "NICU / PICU", "Overall / Consolidated", "CUSTOM"];
+    }
+    if (d.includes("operation")) {
+      return ["Main OT-1", "Main OT-2", "Minor OT / Emergency OT", "Overall / Consolidated", "CUSTOM"];
+    }
+    return [ind.department, "Overall / Consolidated", "CUSTOM"];
+  }
+
   let CURRENT_USER = null;
   let STATE = {
     adminApproved: false,
@@ -709,7 +785,7 @@
     auditLogs: [],
     hospitalUsers: []
   };
-  let ACTIVE_CELL = null;
+  let ACTIVE_CELL = null; // { ind, monthYear, monthEntries }
   let EDITING_STAFF = null;
   let TREND_CHART_INSTANCE = null;
   let DEPT_BAR_INSTANCE = null;
@@ -726,13 +802,40 @@
   }
   const LAST_6_MONTHS = getLast6Months();
 
+  // Consolidate multiple Sub-Unit entries for a given (Indicator S.No, Month)
+  function getConsolidatedMonthStats(ind, monthYear) {
+    const list = STATE.entries.filter(e => Number(e.sno) === Number(ind.sno) && e.monthYear === monthYear);
+    if (!list.length) return null;
+
+    const totalNum = list.reduce((acc, x) => acc + (Number(x.numerator) || 0), 0);
+    const totalDen = list.reduce((acc, x) => acc + (Number(x.denominator) || 0), 0);
+    const mult = Number(ind.multiplier);
+
+    let consolidatedResult = 0;
+    if (mult === 0) {
+      consolidatedResult = totalNum;
+    } else if (totalDen > 0) {
+      consolidatedResult = Number(((totalNum / totalDen) * mult).toFixed(2));
+    }
+
+    const allApproved = list.every(x => x.approvalStatus === "Approved");
+    return {
+      list,
+      count: list.length,
+      totalNum,
+      totalDen,
+      result: consolidatedResult,
+      allApproved
+    };
+  }
+
   function isBenchmarkBreached(sno, resultVal) {
     const bm = STATE.benchmarks ? STATE.benchmarks[Number(sno)] : null;
     if (!bm || bm.target === "" || bm.target === null || isNaN(Number(bm.target))) return false;
     const val = Number(resultVal);
     const tgt = Number(bm.target);
     if (bm.condition === ">=") return val < tgt;
-    return val > tgt; // default "<="
+    return val > tgt;
   }
 
   function renderDeptCheckboxes(containerId, selectedList = []) {
@@ -987,34 +1090,42 @@
       const bmLabel = bm ? `<span class="px-1.5 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded font-bold">${bm.condition} ${bm.target}</span>` : `<span class="text-slate-400">Not Set</span>`;
 
       const monthCells = LAST_6_MONTHS.map(m => {
-        const entry = STATE.entries.find(e => Number(e.sno) === Number(ind.sno) && e.monthYear === m);
-        if (!entry) {
+        const stats = getConsolidatedMonthStats(ind, m);
+        if (!stats) {
           return `<td onclick='openEntryModal(${ind.sno}, "${m}")' class="p-2 border-r border-slate-200 text-center cursor-pointer hover:bg-indigo-50 transition">
             <span class="text-[11px] text-slate-400 font-medium">+ Enter</span>
           </td>`;
         }
-        const isApproved = entry.approvalStatus === "Approved";
-        const breached = isBenchmarkBreached(ind.sno, entry.result);
+        const breached = isBenchmarkBreached(ind.sno, stats.result);
         let badgeCls = "bg-amber-50 text-amber-800 border-amber-300";
         if (breached) {
           badgeCls = "bg-rose-50 text-rose-800 border-rose-400 ring-1 ring-rose-300";
-        } else if (isApproved) {
+        } else if (stats.allApproved) {
           badgeCls = "bg-emerald-50 text-emerald-800 border-emerald-300";
         }
 
+        const subUnitBadge = stats.count > 1
+          ? `<div class="text-[9px] font-bold text-indigo-700 bg-white/80 rounded px-1 mt-0.5 border border-indigo-200">${stats.count} Sub-Units</div>`
+          : `<div class="text-[9px] opacity-75 truncate max-w-[105px] mx-auto">${stats.list[0].location}</div>`;
+
         return `<td onclick='openEntryModal(${ind.sno}, "${m}")' class="p-1.5 border-r border-slate-200 text-center cursor-pointer hover:opacity-80">
           <div class="border ${badgeCls} rounded-lg px-1.5 py-1">
-            <div class="font-extrabold text-xs">${entry.result} ${breached ? '<i class="fa-solid fa-triangle-exclamation text-rose-600"></i>' : ''}</div>
-            <div class="text-[10px] opacity-75">${entry.numerator}/${entry.denominator}</div>
-            <div class="text-[9px] uppercase font-bold mt-0.5">${isApproved ? "✓ Approved" : "⏳ Pending"}</div>
+            <div class="font-extrabold text-xs">${stats.result} ${breached ? '<i class="fa-solid fa-triangle-exclamation text-rose-600"></i>' : ''}</div>
+            <div class="text-[10px] opacity-75">${stats.totalNum}/${stats.totalDen}</div>
+            ${subUnitBadge}
+            <div class="text-[9px] uppercase font-bold mt-0.5">${stats.allApproved ? "✓ Approved" : "⏳ Pending"}</div>
           </div>
         </td>`;
       }).join("");
 
+      const sharedTag = ind.isShared
+        ? `<span class="ml-1 px-1.5 py-0.2 bg-purple-100 text-purple-700 rounded text-[9px] font-bold">Hospital-Wide</span>`
+        : "";
+
       return `<tr class="hover:bg-slate-50/80">
         <td class="p-2.5 border-r border-slate-200 text-center font-bold text-slate-600">${ind.sno}</td>
         <td class="p-2.5 border-r border-slate-200">
-          <div class="font-bold text-slate-900">${ind.name}</div>
+          <div class="font-bold text-slate-900">${ind.name} ${sharedTag}</div>
           <div class="text-[11px] text-indigo-600 font-semibold mt-0.5">${ind.department} • <span class="text-slate-400">${ind.unitFreq}</span></div>
         </td>
         <td class="p-2.5 border-r border-slate-200 text-center text-[11px]">${bmLabel}</td>
@@ -1029,7 +1140,196 @@
   }
 
   // =========================================================================
-  // TREND GRAPHS & ANALYTICS (Chart.js)
+  // SUB-UNIT / LOCATION BREAKDOWN MODAL + ENTRY
+  // =========================================================================
+  function openEntryModal(sno, monthYear) {
+    const ind = STATE.indicators.find(i => Number(i.sno) === Number(sno));
+    const stats = getConsolidatedMonthStats(ind, monthYear);
+    ACTIVE_CELL = { ind, monthYear, stats };
+
+    const bm = STATE.benchmarks ? STATE.benchmarks[Number(sno)] : null;
+    document.getElementById("em-bm-hint").textContent = bm
+      ? `Hospital Benchmark: ${bm.condition} ${bm.target}`
+      : "No benchmark set for this indicator";
+
+    document.getElementById("em-month-badge").textContent = monthYear;
+    document.getElementById("em-title").textContent = `#${ind.sno}. ${ind.name}`;
+    document.getElementById("em-num-def").textContent = ind.numeratorDef;
+    document.getElementById("em-den-def").textContent = ind.denominatorDef;
+    document.getElementById("em-hindi").textContent = ind.meaningHindi;
+
+    // Populate Sub-Unit / Location Dropdown
+    const locs = getLocationsForIndicator(ind);
+    const locSel = document.getElementById("em-location-select");
+    locSel.innerHTML = locs.map(l =>
+      `<option value="${l}">${l === "CUSTOM" ? "+ Other / Custom Ward or Machine..." : l}</option>`
+    ).join("");
+    document.getElementById("em-custom-loc-box").classList.add("hidden");
+    document.getElementById("em-custom-loc-input").value = "";
+
+    // Show existing Sub-Units table if entries exist
+    const listBox = document.getElementById("em-existing-list-box");
+    const tbody = document.getElementById("em-existing-tbody");
+    if (stats && stats.list.length > 0) {
+      listBox.classList.remove("hidden");
+      document.getElementById("em-consolidated-pill").textContent =
+        `Hospital Total: ${stats.result} (${stats.totalNum}/${stats.totalDen})`;
+
+      const isAdminApproved = CURRENT_USER.role === "Admin" && STATE.adminApproved;
+      tbody.innerHTML = stats.list.map(item => `
+        <tr>
+          <td class="p-2 font-bold text-slate-800">${item.location}<div class="text-[10px] font-normal text-slate-400">by ${item.enteredBy}</div></td>
+          <td class="p-2 text-center font-mono">${item.numerator} / ${item.denominator}</td>
+          <td class="p-2 text-center font-extrabold text-indigo-700">${item.result}</td>
+          <td class="p-2 text-center">
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${item.approvalStatus === 'Approved' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+              ${item.approvalStatus}
+            </span>
+          </td>
+          <td class="p-2 text-right space-x-1">
+            <button type="button" onclick='loadSubUnitIntoForm("${item.entryId}")' class="px-2 py-1 bg-slate-100 hover:bg-indigo-100 text-indigo-700 rounded text-[10px] font-bold" title="Edit">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            ${isAdminApproved && item.approvalStatus !== "Approved" ? `
+              <button type="button" onclick='approveEntryById("${item.entryId}")' class="px-2 py-1 bg-emerald-600 text-white rounded text-[10px] font-bold" title="Approve">
+                <i class="fa-solid fa-check"></i>
+              </button>` : ""}
+            ${isAdminApproved ? `
+              <button type="button" onclick='deleteEntryById("${item.entryId}")' class="px-2 py-1 bg-red-600 text-white rounded text-[10px] font-bold" title="Delete">
+                <i class="fa-solid fa-trash"></i>
+              </button>` : ""}
+          </td>
+        </tr>
+      `).join("");
+    } else {
+      listBox.classList.add("hidden");
+    }
+
+    // Reset inputs for fresh entry
+    document.getElementById("em-num-input").value = "";
+    document.getElementById("em-den-input").value = ind.multiplier === 0 ? 1 : "";
+    liveCalcResult();
+
+    document.getElementById("entry-modal").classList.remove("hidden");
+  }
+
+  function onLocationSelectChange() {
+    const val = document.getElementById("em-location-select").value;
+    document.getElementById("em-custom-loc-box").classList.toggle("hidden", val !== "CUSTOM");
+    if (val !== "CUSTOM" && ACTIVE_CELL && ACTIVE_CELL.stats) {
+      const match = ACTIVE_CELL.stats.list.find(x => x.location.toLowerCase() === val.toLowerCase());
+      if (match) {
+        document.getElementById("em-num-input").value = match.numerator;
+        document.getElementById("em-den-input").value = match.denominator;
+        liveCalcResult();
+      }
+    }
+  }
+
+  function loadSubUnitIntoForm(entryId) {
+    const item = STATE.entries.find(e => e.entryId === entryId);
+    if (!item) return;
+    const locSel = document.getElementById("em-location-select");
+    const optExists = Array.from(locSel.options).some(o => o.value.toLowerCase() === item.location.toLowerCase());
+    if (optExists) {
+      locSel.value = Array.from(locSel.options).find(o => o.value.toLowerCase() === item.location.toLowerCase()).value;
+      document.getElementById("em-custom-loc-box").classList.add("hidden");
+    } else {
+      locSel.value = "CUSTOM";
+      document.getElementById("em-custom-loc-box").classList.remove("hidden");
+      document.getElementById("em-custom-loc-input").value = item.location;
+    }
+    document.getElementById("em-num-input").value = item.numerator;
+    document.getElementById("em-den-input").value = item.denominator;
+    liveCalcResult();
+  }
+
+  function liveCalcResult() {
+    if (!ACTIVE_CELL) return;
+    const num = parseFloat(document.getElementById("em-num-input").value) || 0;
+    const den = parseFloat(document.getElementById("em-den-input").value) || 0;
+    const mult = Number(ACTIVE_CELL.ind.multiplier);
+    let res = 0;
+    if (mult === 0) res = num;
+    else if (den > 0) res = ((num / den) * mult).toFixed(2);
+    document.getElementById("em-calc-preview").textContent = res;
+  }
+
+  async function submitKPIEntry() {
+    const num = document.getElementById("em-num-input").value;
+    const den = document.getElementById("em-den-input").value;
+    if (num === "" || den === "") return alert("Please enter both Numerator and Denominator.");
+
+    let loc = document.getElementById("em-location-select").value;
+    if (loc === "CUSTOM") {
+      loc = document.getElementById("em-custom-loc-input").value.trim();
+      if (!loc) return alert("Please enter the Custom Ward / Machine / Location name.");
+    }
+
+    const res = await callBackend({
+      action: "saveKPIEntry",
+      hospitalId: CURRENT_USER.hospitalId,
+      hospitalName: STATE.hospitalName || CURRENT_USER.hospitalName,
+      username: CURRENT_USER.username,
+      enteredByLabel: `${CURRENT_USER.fullName} (${CURRENT_USER.username})`,
+      monthYear: ACTIVE_CELL.monthYear,
+      sno: ACTIVE_CELL.ind.sno,
+      indicatorName: ACTIVE_CELL.ind.name,
+      department: ACTIVE_CELL.ind.department,
+      location: loc,
+      numerator: Number(num),
+      denominator: Number(den),
+      multiplier: ACTIVE_CELL.ind.multiplier
+    });
+
+    if (res.success) {
+      await loadDashboard();
+      // Re-open modal refreshed so user can immediately enter next location (e.g., X-Ray after USG)
+      openEntryModal(ACTIVE_CELL.ind.sno, ACTIVE_CELL.monthYear);
+    } else {
+      alert(res.message);
+    }
+  }
+
+  async function approveEntryById(entryId) {
+    const res = await callBackend({
+      action: "approveKPIEntry",
+      hospitalId: CURRENT_USER.hospitalId,
+      hospitalName: STATE.hospitalName,
+      username: `${CURRENT_USER.fullName} (${CURRENT_USER.username})`,
+      entryId: entryId
+    });
+    if (res.success) {
+      await loadDashboard();
+      if (!document.getElementById("entry-modal").classList.contains("hidden") && ACTIVE_CELL) {
+        openEntryModal(ACTIVE_CELL.ind.sno, ACTIVE_CELL.monthYear);
+      }
+    } else {
+      alert(res.message);
+    }
+  }
+
+  async function deleteEntryById(entryId) {
+    if (!confirm("Are you sure you want to delete this sub-unit entry? This deletion will be logged with your Mobile ID & timestamp.")) return;
+    const res = await callBackend({
+      action: "deleteKPIEntry",
+      hospitalId: CURRENT_USER.hospitalId,
+      hospitalName: STATE.hospitalName,
+      username: `${CURRENT_USER.fullName} (${CURRENT_USER.username})`,
+      entryId: entryId
+    });
+    if (res.success) {
+      await loadDashboard();
+      if (!document.getElementById("entry-modal").classList.contains("hidden") && ACTIVE_CELL) {
+        openEntryModal(ACTIVE_CELL.ind.sno, ACTIVE_CELL.monthYear);
+      }
+    } else {
+      alert(res.message);
+    }
+  }
+
+  // =========================================================================
+  // TREND GRAPHS & ANALYTICS (USES CONSOLIDATED HOSPITAL MONTHLY VALUES)
   // =========================================================================
   function renderAnalyticsAndGraphs() {
     document.getElementById("stat-total-kpis").textContent = STATE.indicators.length;
@@ -1038,10 +1338,15 @@
     const pendingCnt = STATE.entries.length - approvedCnt;
     document.getElementById("stat-approved-ratio").textContent = `${approvedCnt} / ${pendingCnt}`;
 
-    const breachCnt = STATE.entries.filter(e => isBenchmarkBreached(e.sno, e.result)).length;
+    let breachCnt = 0;
+    STATE.indicators.forEach(ind => {
+      LAST_6_MONTHS.forEach(m => {
+        const st = getConsolidatedMonthStats(ind, m);
+        if (st && isBenchmarkBreached(ind.sno, st.result)) breachCnt++;
+      });
+    });
     document.getElementById("stat-breaches").textContent = breachCnt;
 
-    // Populate Indicator selector for Trend Line Chart
     const sel = document.getElementById("chart-kpi-select");
     const prevVal = sel.value;
     sel.innerHTML = STATE.indicators.map(i =>
@@ -1050,7 +1355,6 @@
     if (prevVal && STATE.indicators.some(i => String(i.sno) === String(prevVal))) {
       sel.value = prevVal;
     } else {
-      // Auto-select first indicator that actually has data entered
       const withData = STATE.indicators.find(i => STATE.entries.some(e => Number(e.sno) === Number(i.sno)));
       if (withData) sel.value = withData.sno;
     }
@@ -1066,12 +1370,12 @@
 
     const bm = STATE.benchmarks ? STATE.benchmarks[sno] : null;
     const actualData = LAST_6_MONTHS.map(m => {
-      const e = STATE.entries.find(x => Number(x.sno) === sno && x.monthYear === m);
-      return e ? Number(e.result) : null;
+      const st = getConsolidatedMonthStats(ind, m);
+      return st ? Number(st.result) : null;
     });
 
     const datasets = [{
-      label: `Actual Result (${ind.unitFreq})`,
+      label: `Consolidated Hospital Result (${ind.unitFreq})`,
       data: actualData,
       borderColor: "#4f46e5",
       backgroundColor: "rgba(79, 70, 229, 0.15)",
@@ -1110,8 +1414,8 @@
     const validNums = actualData.filter(v => v !== null);
     const avg = validNums.length ? (validNums.reduce((a, b) => a + b, 0) / validNums.length).toFixed(2) : "N/A";
     document.getElementById("chart-kpi-summary").innerHTML = `
-      <span><b>Department:</b> ${ind.department}</span>
-      <span><b>6-Month Average:</b> ${avg}</span>
+      <span><b>Primary Dept:</b> ${ind.department}</span>
+      <span><b>6-Month Consolidated Avg:</b> ${avg}</span>
       <span><b>Benchmark Target:</b> ${bm ? `${bm.condition} ${bm.target}` : "Not Set"}</span>
     `;
   }
@@ -1202,13 +1506,13 @@
     document.getElementById("pending-count").textContent = pending.length;
     const tbody = document.getElementById("pending-tbody");
     if (!pending.length) {
-      tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">No pending department entries! All data is up to date.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">No pending sub-unit entries! All data is up to date.</td></tr>`;
       return;
     }
     tbody.innerHTML = pending.map(e => `
       <tr class="hover:bg-amber-50/40">
         <td class="p-2.5 font-bold">${e.monthYear}</td>
-        <td class="p-2.5 text-indigo-700 font-semibold">${e.department}</td>
+        <td class="p-2.5"><span class="px-2 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded font-bold">${e.location}</span></td>
         <td class="p-2.5 font-semibold text-slate-900">#${e.sno}. ${e.indicatorName}</td>
         <td class="p-2.5 text-center font-mono">${e.numerator} / ${e.denominator}</td>
         <td class="p-2.5 text-center font-extrabold text-indigo-700">${e.result}</td>
@@ -1300,118 +1604,12 @@
     }
   }
 
-  function openEntryModal(sno, monthYear) {
-    const ind = STATE.indicators.find(i => Number(i.sno) === Number(sno));
-    const existing = STATE.entries.find(e => Number(e.sno) === Number(sno) && e.monthYear === monthYear);
-    ACTIVE_CELL = { ind, monthYear, existing };
-
-    const bm = STATE.benchmarks ? STATE.benchmarks[Number(sno)] : null;
-    document.getElementById("em-bm-hint").textContent = bm
-      ? `Hospital Benchmark: ${bm.condition} ${bm.target}`
-      : "No benchmark set for this indicator";
-
-    document.getElementById("em-month-badge").textContent = monthYear;
-    document.getElementById("em-title").textContent = `#${ind.sno}. ${ind.name}`;
-    document.getElementById("em-num-def").textContent = ind.numeratorDef;
-    document.getElementById("em-den-def").textContent = ind.denominatorDef;
-    document.getElementById("em-hindi").textContent = ind.meaningHindi;
-
-    document.getElementById("em-num-input").value = existing ? existing.numerator : "";
-    document.getElementById("em-den-input").value = existing ? existing.denominator : (ind.multiplier === 0 ? 1 : "");
-    liveCalcResult();
-
-    const metaBox = document.getElementById("em-meta-info");
-    if (existing) {
-      metaBox.innerHTML = `Entered by <b>${existing.enteredBy}</b> at ${existing.entryTimestamp} • Status: <b>${existing.approvalStatus}</b>` +
-        (existing.approvedBy ? ` (Approved by ${existing.approvedBy} at ${existing.approvalTimestamp})` : "");
-      metaBox.classList.remove("hidden");
-    } else {
-      metaBox.classList.add("hidden");
-    }
-
-    const canAdminAct = CURRENT_USER.role === "Admin" && STATE.adminApproved && Boolean(existing);
-    document.getElementById("em-admin-controls").classList.toggle("hidden", !canAdminAct);
-
-    document.getElementById("entry-modal").classList.remove("hidden");
-  }
-
-  function liveCalcResult() {
-    if (!ACTIVE_CELL) return;
-    const num = parseFloat(document.getElementById("em-num-input").value) || 0;
-    const den = parseFloat(document.getElementById("em-den-input").value) || 0;
-    const mult = Number(ACTIVE_CELL.ind.multiplier);
-    let res = 0;
-    if (mult === 0) res = num;
-    else if (den > 0) res = ((num / den) * mult).toFixed(2);
-    document.getElementById("em-calc-preview").textContent = res;
-  }
-
-  async function submitKPIEntry() {
-    const num = document.getElementById("em-num-input").value;
-    const den = document.getElementById("em-den-input").value;
-    if (num === "" || den === "") return alert("Please enter both Numerator and Denominator.");
-
-    const res = await callBackend({
-      action: "saveKPIEntry",
-      hospitalId: CURRENT_USER.hospitalId,
-      hospitalName: STATE.hospitalName || CURRENT_USER.hospitalName,
-      username: CURRENT_USER.username,
-      enteredByLabel: `${CURRENT_USER.fullName} (${CURRENT_USER.username})`,
-      monthYear: ACTIVE_CELL.monthYear,
-      sno: ACTIVE_CELL.ind.sno,
-      indicatorName: ACTIVE_CELL.ind.name,
-      department: ACTIVE_CELL.ind.department,
-      numerator: Number(num),
-      denominator: Number(den),
-      multiplier: ACTIVE_CELL.ind.multiplier
-    });
-
-    if (res.success) {
-      closeModal("entry-modal");
-      await loadDashboard();
-    } else {
-      alert(res.message);
-    }
-  }
-
-  async function approveEntryById(entryId) {
-    const res = await callBackend({
-      action: "approveKPIEntry",
-      hospitalId: CURRENT_USER.hospitalId,
-      hospitalName: STATE.hospitalName,
-      username: `${CURRENT_USER.fullName} (${CURRENT_USER.username})`,
-      entryId: entryId
-    });
-    if (res.success) {
-      closeModal("entry-modal");
-      await loadDashboard();
-    } else {
-      alert(res.message);
-    }
-  }
-
-  async function deleteEntryById(entryId) {
-    if (!confirm("Are you sure you want to delete this entry? This deletion will be logged with your Mobile ID & timestamp.")) return;
-    const res = await callBackend({
-      action: "deleteKPIEntry",
-      hospitalId: CURRENT_USER.hospitalId,
-      hospitalName: STATE.hospitalName,
-      username: `${CURRENT_USER.fullName} (${CURRENT_USER.username})`,
-      entryId: entryId
-    });
-    if (res.success) {
-      closeModal("entry-modal");
-      await loadDashboard();
-    } else {
-      alert(res.message);
-    }
-  }
-
   function openRCPAModal(sno) {
     document.getElementById("rcpa-month").innerHTML = LAST_6_MONTHS.map(m => `<option value="${m}">${m}</option>`).join("");
     document.getElementById("rcpa-indicator").innerHTML = STATE.indicators.map(i =>
       `<option value="${i.sno}" ${Number(i.sno) === Number(sno) ? "selected" : ""}>#${i.sno} - ${i.name}</option>`
     ).join("");
+    document.getElementById("rcpa-location").value = "";
     document.getElementById("rcpa-modal").classList.remove("hidden");
   }
 
@@ -1426,6 +1624,7 @@
       username: CURRENT_USER.username,
       enteredByLabel: `${CURRENT_USER.fullName} (${CURRENT_USER.username})`,
       monthYear: document.getElementById("rcpa-month").value,
+      location: document.getElementById("rcpa-location").value,
       sno: sno,
       indicatorName: ind.name,
       department: ind.department,
@@ -1453,8 +1652,8 @@
     tbody.innerHTML = STATE.rcpas.map(r => `
       <tr class="hover:bg-slate-50">
         <td class="p-2.5 font-bold">${r.monthYear}</td>
+        <td class="p-2.5"><span class="px-2 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded font-bold">${r.location || r.department}</span></td>
         <td class="p-2.5 font-semibold text-slate-800">#${r.sno}. ${r.indicatorName}</td>
-        <td class="p-2.5 text-indigo-600 font-semibold">${r.department}</td>
         <td class="p-2.5">${r.rootCause}</td>
         <td class="p-2.5">${r.correctiveAction}</td>
         <td class="p-2.5">${r.preventiveAction}</td>
